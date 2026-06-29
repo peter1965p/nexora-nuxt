@@ -13,53 +13,70 @@ const desc = computed(() => (hero.value as any).desc || '')
 
 // Neural canvas
 const canvasRef = ref<HTMLCanvasElement | null>(null)
-let animId = 0
 
 function startNeural(canvas: HTMLCanvasElement) {
-  const ctx = canvas.getContext('2d')!
-  const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight }
-  resize()
-  window.addEventListener('resize', resize)
+  let initRafId = 0
+  let animId    = 0
+  let alive     = true
 
-  const pts = Array.from({ length: 70 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    vx: (Math.random() - 0.5) * 0.4,
-    vy: (Math.random() - 0.5) * 0.4,
-  }))
-
-  const hex2 = (n: number) => Math.floor(n * 255).toString(16).padStart(2, '0')
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    for (const p of pts) {
-      p.x += p.vx; p.y += p.vy
-      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1
-    }
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i + 1; j < pts.length; j++) {
-        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y
-        const d  = Math.sqrt(dx * dx + dy * dy)
-        if (d < 140) {
-          const a = (1 - d / 140) * 0.35
-          ctx.beginPath()
-          ctx.strokeStyle = accent.value + hex2(a)
-          ctx.lineWidth   = 0.6
-          ctx.moveTo(pts[i].x, pts[i].y)
-          ctx.lineTo(pts[j].x, pts[j].y)
-          ctx.stroke()
-        }
-      }
-      ctx.beginPath()
-      ctx.fillStyle = accent.value + '88'
-      ctx.arc(pts[i].x, pts[i].y, 1.5, 0, Math.PI * 2)
-      ctx.fill()
-    }
-    animId = requestAnimationFrame(draw)
+  const onResize = () => {
+    canvas.width  = canvas.offsetWidth  || window.innerWidth
+    canvas.height = canvas.offsetHeight || window.innerHeight
   }
-  draw()
-  return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize) }
+  window.addEventListener('resize', onResize)
+
+  // Wait one frame so canvas has layout dimensions
+  initRafId = requestAnimationFrame(() => {
+    onResize()
+
+    const pts = Array.from({ length: 70 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+    }))
+
+    const ctx  = canvas.getContext('2d')!
+    const hex2 = (n: number) => Math.floor(n * 255).toString(16).padStart(2, '0')
+
+    function draw() {
+      if (!alive) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      for (const p of pts) {
+        p.x += p.vx; p.y += p.vy
+        if (p.x < 0 || p.x > canvas.width)  p.vx *= -1
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1
+      }
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y
+          const d  = Math.sqrt(dx * dx + dy * dy)
+          if (d < 140) {
+            const a = (1 - d / 140) * 0.35
+            ctx.beginPath()
+            ctx.strokeStyle = accent.value + hex2(a)
+            ctx.lineWidth   = 0.6
+            ctx.moveTo(pts[i].x, pts[i].y)
+            ctx.lineTo(pts[j].x, pts[j].y)
+            ctx.stroke()
+          }
+        }
+        ctx.beginPath()
+        ctx.fillStyle = accent.value + '88'
+        ctx.arc(pts[i].x, pts[i].y, 1.5, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      animId = requestAnimationFrame(draw)
+    }
+    draw()
+  })
+
+  return () => {
+    alive = false
+    cancelAnimationFrame(initRafId)
+    cancelAnimationFrame(animId)
+    window.removeEventListener('resize', onResize)
+  }
 }
 
 let stopNeural: (() => void) | null = null
