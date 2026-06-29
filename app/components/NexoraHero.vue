@@ -78,11 +78,11 @@ onUnmounted(() => { if (stopNeural) stopNeural() })
     <!-- Background -->
     <!-- Grid -->
     <div v-if="bg === 'grid'" class="absolute inset-0 pointer-events-none"
-      style="background-image:linear-gradient(color-mix(in srgb, var(--nx-accent) 8%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--nx-accent) 8%, transparent) 1px,transparent 1px);background-size:48px 48px"></div>
+      :style="`background-image:linear-gradient(${accent}20 1px,transparent 1px),linear-gradient(90deg,${accent}20 1px,transparent 1px);background-size:48px 48px`"></div>
 
     <!-- Dots -->
     <div v-else-if="bg === 'dots'" class="absolute inset-0 pointer-events-none"
-      style="background-image:radial-gradient(color-mix(in srgb, var(--nx-accent) 25%, transparent) 1px, transparent 1px);background-size:32px 32px"></div>
+      :style="`background-image:radial-gradient(${accent}50 1px,transparent 1px);background-size:32px 32px`"></div>
 
     <!-- Neural -->
     <canvas v-else-if="bg === 'neural'" ref="canvasRef"
