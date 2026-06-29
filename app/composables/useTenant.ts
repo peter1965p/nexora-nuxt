@@ -124,7 +124,8 @@ export const useTenant = () => {
     if (import.meta.client) {
       const host = window.location.hostname
       const isLocalhost = host === 'localhost' || host === '127.0.0.1'
-      if (isLocalhost) {
+      const isPreview   = host.endsWith('.pages.dev')
+      if (isLocalhost || isPreview) {
         tenantId = config.public.devTenantId as string
       } else {
         try {
