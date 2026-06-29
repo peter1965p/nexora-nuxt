@@ -64,8 +64,8 @@ let stopNeural: (() => void) | null = null
 
 watch([bg, canvasRef], ([newBg, canvas]) => {
   if (stopNeural) { stopNeural(); stopNeural = null }
-  if (newBg === 'neural' && canvas) stopNeural = startNeural(canvas)
-}, { immediate: true })
+  if (newBg === 'neural' && canvas) stopNeural = startNeural(canvas as HTMLCanvasElement)
+}, { immediate: true, flush: 'post' })
 
 onUnmounted(() => { if (stopNeural) stopNeural() })
 </script>
