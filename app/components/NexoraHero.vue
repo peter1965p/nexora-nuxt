@@ -129,7 +129,7 @@ onUnmounted(() => { if (stopNeural) stopNeural() })
           </div>
 
           <h1 class="font-black tracking-[-0.06em] select-none uppercase"
-              style="font-size:clamp(3.5rem, 10vw, 8rem);line-height:0.9;overflow:visible;padding-top:0.15em">
+              style="font-size:clamp(3.5rem, 10vw, 8rem);line-height:0.9;overflow:visible;padding-top:0.45em">
             <span :style="gradientStyle" style="filter:drop-shadow(0 0 70px rgba(234,88,12,0.45))">
               {{ tenant.companyName }}
             </span>
