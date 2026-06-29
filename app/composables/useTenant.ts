@@ -4,10 +4,17 @@ export interface NexoraBranding {
   tagline?: string
 }
 
+export interface NexoraFooter {
+  tagline?: string
+  statusLabel?: string
+  showStatus?: boolean
+}
+
 export interface NexoraContent {
   hero?: { headline?: string; subheadline?: string; cta?: string }
   about?: { text?: string }
   stats?: Array<{ value: string; label: string }>
+  footer?: NexoraFooter
 }
 
 export interface NexoraService {
@@ -93,6 +100,7 @@ const DEFAULT: TenantData = {
     hero: { headline: 'Willkommen', subheadline: 'Ihr zuverlässiger Partner', cta: 'Kontakt aufnehmen' },
     about: { text: 'Wir sind ein modernes Unternehmen.' },
     stats: [{ value: '10+', label: 'Jahre Erfahrung' }],
+    footer: { tagline: '', statusLabel: 'System Online', showStatus: true },
   },
   services: [],
   contact: {},
@@ -151,6 +159,7 @@ export const useTenant = () => {
           hero: { ...DEFAULT.content.hero, ...(c.hero || {}) },
           about: { ...DEFAULT.content.about, ...(c.about || {}) },
           stats: c.stats?.length ? c.stats : DEFAULT.content.stats,
+          footer: { ...DEFAULT.content.footer, ...(c.footer || {}) },
         },
         services: Array.isArray(s) && s.length ? s : DEFAULT.services,
         contact: { ...DEFAULT.contact, ...k },
