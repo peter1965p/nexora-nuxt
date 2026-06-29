@@ -16,9 +16,9 @@ const accent = computed(() => tenant.value.branding.primaryColor || '#2563eb')
     </a>
 
     <nav class="hidden md:flex items-center gap-8">
-      <a href="#about"    class="text-[9px] font-black uppercase tracking-[0.4em] transition-colors" style="color:var(--nx-muted)">Über uns</a>
-      <a href="#services" class="text-[9px] font-black uppercase tracking-[0.4em] transition-colors" style="color:var(--nx-muted)">Leistungen</a>
-      <a href="#kontakt"  class="text-[9px] font-black uppercase tracking-[0.4em] transition-colors" style="color:var(--nx-muted)">Kontakt</a>
+      <NuxtLink to="/about"      class="text-[9px] font-black uppercase tracking-[0.4em] transition-opacity hover:opacity-100" style="color:var(--nx-muted);text-decoration:none;opacity:.7">Über uns</NuxtLink>
+      <NuxtLink to="/leistungen" class="text-[9px] font-black uppercase tracking-[0.4em] transition-opacity hover:opacity-100" style="color:var(--nx-muted);text-decoration:none;opacity:.7">Leistungen</NuxtLink>
+      <NuxtLink to="/kontakt"    class="text-[9px] font-black uppercase tracking-[0.4em] transition-opacity hover:opacity-100 px-4 py-2 rounded-sm border" :style="{ color: accent, borderColor: accent + '66', opacity: '1' }">Kontakt</NuxtLink>
     </nav>
 
     <button class="md:hidden p-2 text-white" @click="menuOpen = !menuOpen">
@@ -30,9 +30,9 @@ const accent = computed(() => tenant.value.branding.primaryColor || '#2563eb')
          :style="{ background: 'var(--nx-bg)', transform: menuOpen ? 'translateX(0)' : 'translateX(100%)' }">
       <div class="flex flex-col h-full p-10 pt-32">
         <div class="flex flex-col gap-2">
-          <a href="#about"    @click="menuOpen=false" class="text-4xl font-black italic uppercase py-5" style="border-bottom:1px solid var(--nx-border);color:var(--nx-text)">Über uns</a>
-          <a href="#services" @click="menuOpen=false" class="text-4xl font-black italic uppercase py-5" style="border-bottom:1px solid var(--nx-border);color:var(--nx-text)">Leistungen</a>
-          <a href="#kontakt"  @click="menuOpen=false" class="text-4xl font-black italic uppercase py-5" style="border-bottom:1px solid var(--nx-border);color:var(--nx-text)">Kontakt</a>
+          <NuxtLink to="/about"      @click="menuOpen=false" class="text-4xl font-black italic uppercase py-5" style="border-bottom:1px solid var(--nx-border);color:var(--nx-text);text-decoration:none;display:block">Über uns</NuxtLink>
+          <NuxtLink to="/leistungen" @click="menuOpen=false" class="text-4xl font-black italic uppercase py-5" style="border-bottom:1px solid var(--nx-border);color:var(--nx-text);text-decoration:none;display:block">Leistungen</NuxtLink>
+          <NuxtLink to="/kontakt"    @click="menuOpen=false" class="text-4xl font-black italic uppercase py-5" style="border-bottom:1px solid var(--nx-border);text-decoration:none;display:block" :style="{ color: accent }">Kontakt</NuxtLink>
         </div>
         <div v-if="tenant.pages?.length" class="flex flex-col gap-2 mt-auto">
           <NuxtLink v-for="pg in tenant.pages" :key="pg.slug" :to="`/${pg.slug}`" @click="menuOpen=false"

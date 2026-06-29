@@ -42,10 +42,10 @@ const hero   = computed(() => tenant.value.content.hero || {})
       </div>
 
       <!-- CTA -->
-      <a href="#kontakt" class="inline-block text-white text-[11px] font-bold uppercase tracking-widest px-8 py-3 rounded-sm transition-colors"
+      <NuxtLink to="/kontakt" class="inline-block text-white text-[11px] font-bold uppercase tracking-widest px-8 py-3 rounded-sm transition-colors"
          :style="{ background: accent }">
         {{ hero.cta || 'Kontakt aufnehmen' }} →
-      </a>
+      </NuxtLink>
     </div>
   </section>
 </template>
