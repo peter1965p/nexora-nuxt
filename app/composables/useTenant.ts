@@ -46,6 +46,18 @@ export interface NexoraPage {
   contentType: 'html' | 'markdown'
 }
 
+export interface NexoraStackItem {
+  label: string
+  color: string
+}
+
+export interface NexoraStackConfig {
+  enabled: boolean
+  items: NexoraStackItem[]
+  title?: string
+  legend?: Record<string, string>
+}
+
 export interface TenantData {
   tenantId: string
   companyName: string
@@ -55,6 +67,7 @@ export interface TenantData {
   contact: NexoraContact
   pages: NexoraPage[]
   theme: string
+  stack: NexoraStackConfig
 }
 
 const THEMES: Record<string, Record<string, string>> = {
@@ -114,6 +127,7 @@ const DEFAULT: TenantData = {
   contact: {},
   pages: [],
   theme: 'midnight',
+  stack: { enabled: false, items: [], title: 'TECH STACK', legend: {} },
 }
 
 export const useTenant = () => {
@@ -146,12 +160,13 @@ export const useTenant = () => {
     if (!tenantId) { resolved.value = true; return }
 
     try {
-      const [branding, content, services, contact, pagesRes] = await Promise.allSettled([
+      const [branding, content, services, contact, pagesRes, stackRes] = await Promise.allSettled([
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/branding`),
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/content`),
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/services`),
         $fetch<NexoraContact>(`${apiUrl}/api/public/${tenantId}/contact`),
         $fetch<{ pages: NexoraPage[]; theme: string }>(`${apiUrl}/api/public/${tenantId}/pages`),
+        $fetch<NexoraStackConfig>(`${apiUrl}/api/public/${tenantId}/stack`),
       ])
 
       const b  = branding.status  === 'fulfilled' ? branding.value  : {}
@@ -159,6 +174,7 @@ export const useTenant = () => {
       const s  = services.status  === 'fulfilled' ? services.value  : []
       const k  = contact.status   === 'fulfilled' ? contact.value   : {}
       const pg = pagesRes.status  === 'fulfilled' ? pagesRes.value  : { pages: [], theme: 'midnight' }
+      const st = stackRes.status  === 'fulfilled' ? stackRes.value  : null
 
       const theme = pg.theme || 'midnight'
 
@@ -182,6 +198,12 @@ export const useTenant = () => {
         contact: { ...DEFAULT.contact, ...k },
         pages: pg.pages || [],
         theme,
+        stack: {
+          enabled: st?.enabled ?? false,
+          items:   st?.items   || [],
+          title:   st?.title   || 'TECH STACK',
+          legend:  st?.legend  || {},
+        },
       }
 
       applyTheme(theme, b.primaryColor)

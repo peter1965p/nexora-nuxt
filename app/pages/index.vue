@@ -6,6 +6,7 @@
     <NexoraNavbar />
     <main>
       <NexoraHero />
+      <NexoraStack />
     </main>
     <NexoraFooter />
   </div>
