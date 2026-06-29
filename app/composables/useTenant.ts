@@ -119,12 +119,14 @@ export const useTenant = () => {
     if (resolved.value) return
 
     const apiUrl = config.public.plexoraApiUrl as string
-    let tenantId = config.public.devTenantId as string
+    let tenantId = ''
 
     if (import.meta.client) {
       const host = window.location.hostname
       const isLocalhost = host === 'localhost' || host === '127.0.0.1'
-      if (!isLocalhost) {
+      if (isLocalhost) {
+        tenantId = config.public.devTenantId as string
+      } else {
         try {
           const r = await $fetch<{ tenantId: string }>(
             `${apiUrl}/api/public/resolve?host=${host}`
