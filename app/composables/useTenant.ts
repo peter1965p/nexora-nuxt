@@ -24,6 +24,13 @@ export interface NexoraContact {
   region?: string
 }
 
+export interface NexoraPage {
+  slug: string
+  title: string
+  content: string
+  contentType: 'html' | 'markdown'
+}
+
 export interface TenantData {
   tenantId: string
   companyName: string
@@ -31,12 +38,57 @@ export interface TenantData {
   content: NexoraContent
   services: NexoraService[]
   contact: NexoraContact
+  pages: NexoraPage[]
+  theme: string
+}
+
+const THEMES: Record<string, Record<string, string>> = {
+  midnight: {
+    '--nx-bg':      '#05070a',
+    '--nx-surface': '#0d1117',
+    '--nx-border':  '#1e293b',
+    '--nx-text':    '#f1f5f9',
+    '--nx-muted':   '#64748b',
+    '--nx-accent':  '#f97316',
+  },
+  slate: {
+    '--nx-bg':      '#0f172a',
+    '--nx-surface': '#1e293b',
+    '--nx-border':  '#334155',
+    '--nx-text':    '#e2e8f0',
+    '--nx-muted':   '#94a3b8',
+    '--nx-accent':  '#3b82f6',
+  },
+  emerald: {
+    '--nx-bg':      '#0a0f0a',
+    '--nx-surface': '#111811',
+    '--nx-border':  '#1a2e1a',
+    '--nx-text':    '#f0fdf4',
+    '--nx-muted':   '#6b7280',
+    '--nx-accent':  '#10b981',
+  },
+  light: {
+    '--nx-bg':      '#ffffff',
+    '--nx-surface': '#f8fafc',
+    '--nx-border':  '#e2e8f0',
+    '--nx-text':    '#1e293b',
+    '--nx-muted':   '#64748b',
+    '--nx-accent':  '#2563eb',
+  },
+}
+
+function applyTheme(themeKey: string, accentOverride?: string) {
+  if (!import.meta.client) return
+  const vars = THEMES[themeKey] || THEMES.midnight
+  const root = document.documentElement
+  for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v)
+  if (accentOverride) root.style.setProperty('--nx-accent', accentOverride)
 }
 
 const DEFAULT: TenantData = {
   tenantId: '',
   companyName: 'Mein Unternehmen',
-  branding: { primaryColor: '#2563eb' },
+  branding: { primaryColor: '#f97316' },
   content: {
     hero: { headline: 'Willkommen', subheadline: 'Ihr zuverlässiger Partner', cta: 'Kontakt aufnehmen' },
     about: { text: 'Wir sind ein modernes Unternehmen.' },
@@ -44,6 +96,8 @@ const DEFAULT: TenantData = {
   },
   services: [],
   contact: {},
+  pages: [],
+  theme: 'midnight',
 }
 
 export const useTenant = () => {
@@ -73,17 +127,21 @@ export const useTenant = () => {
     if (!tenantId) { resolved.value = true; return }
 
     try {
-      const [branding, content, services, contact] = await Promise.allSettled([
-        $fetch<NexoraBranding>(`${apiUrl}/api/public/${tenantId}/branding`),
-        $fetch<NexoraContent>(`${apiUrl}/api/public/${tenantId}/content`),
-        $fetch<NexoraService[]>(`${apiUrl}/api/public/${tenantId}/services`),
+      const [branding, content, services, contact, pagesRes] = await Promise.allSettled([
+        $fetch<any>(`${apiUrl}/api/public/${tenantId}/branding`),
+        $fetch<any>(`${apiUrl}/api/public/${tenantId}/content`),
+        $fetch<any>(`${apiUrl}/api/public/${tenantId}/services`),
         $fetch<NexoraContact>(`${apiUrl}/api/public/${tenantId}/contact`),
+        $fetch<{ pages: NexoraPage[]; theme: string }>(`${apiUrl}/api/public/${tenantId}/pages`),
       ])
 
-      const b = branding.status === 'fulfilled' ? branding.value : {}
-      const c = content.status === 'fulfilled' ? content.value : {}
-      const s = services.status === 'fulfilled' ? services.value : []
-      const k = contact.status === 'fulfilled' ? contact.value : {}
+      const b  = branding.status  === 'fulfilled' ? branding.value  : {}
+      const c  = content.status   === 'fulfilled' ? content.value   : {}
+      const s  = services.status  === 'fulfilled' ? services.value  : []
+      const k  = contact.status   === 'fulfilled' ? contact.value   : {}
+      const pg = pagesRes.status  === 'fulfilled' ? pagesRes.value  : { pages: [], theme: 'midnight' }
+
+      const theme = pg.theme || 'midnight'
 
       tenant.value = {
         tenantId,
@@ -96,7 +154,11 @@ export const useTenant = () => {
         },
         services: Array.isArray(s) && s.length ? s : DEFAULT.services,
         contact: { ...DEFAULT.contact, ...k },
+        pages: pg.pages || [],
+        theme,
       }
+
+      applyTheme(theme, b.primaryColor)
     } catch {}
 
     resolved.value = true

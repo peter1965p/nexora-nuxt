@@ -2,14 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --nx-bg:      #05070a;
+  --nx-surface: #0d1117;
+  --nx-border:  #1e293b;
+  --nx-text:    #f1f5f9;
+  --nx-muted:   #64748b;
+  --nx-accent:  #f97316;
+}
+
 * { box-sizing: border-box; }
 
 body {
-  background: #05070a;
-  color: white;
+  background: var(--nx-bg);
+  color: var(--nx-text);
   font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, monospace;
   overflow-x: hidden;
   margin: 0;
+  transition: background .3s, color .3s;
 }
 
 @keyframes marquee {
