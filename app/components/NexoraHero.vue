@@ -16,7 +16,7 @@ const hero   = computed(() => tenant.value.content.hero || {})
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :style="{ background: accent }"></span>
           <span class="relative inline-flex rounded-full h-2 w-2" :style="{ background: accent }"></span>
         </span>
-        Verfügbar für Anfragen
+        {{ hero.location || 'Verfügbar für Anfragen' }}
       </div>
 
       <!-- Company name -->

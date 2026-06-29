@@ -156,7 +156,12 @@ export const useTenant = () => {
         companyName: b.companyName || DEFAULT.companyName,
         branding: { ...DEFAULT.branding, ...b },
         content: {
-          hero: { ...DEFAULT.content.hero, ...(c.hero || {}) },
+          hero: {
+            subheadline: c.hero?.subline      || c.hero?.subheadline || DEFAULT.content.hero?.subheadline,
+            headline:    c.hero?.desc         || c.hero?.headline    || DEFAULT.content.hero?.headline,
+            cta:         c.hero?.ctaLabel     || c.hero?.cta         || DEFAULT.content.hero?.cta,
+            location:    c.hero?.location     || '',
+          },
           about: { ...DEFAULT.content.about, ...(c.about || {}) },
           stats: c.stats?.length ? c.stats : DEFAULT.content.stats,
           footer: { ...DEFAULT.content.footer, ...(c.footer || {}) },
