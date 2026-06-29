@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { tenant } = useTenant()
+const { tenant, resolved } = useTenant()
 const accent = computed(() => tenant.value.branding.primaryColor || '#2563eb')
 </script>
 
@@ -25,7 +25,7 @@ const accent = computed(() => tenant.value.branding.primaryColor || '#2563eb')
     </div>
 
     <div v-else class="border border-white/5 p-10 text-slate-600 text-[11px]">
-      Leistungen werden geladen...
+      {{ resolved ? 'Leistungen werden noch konfiguriert.' : 'Leistungen werden geladen...' }}
     </div>
   </section>
 </template>

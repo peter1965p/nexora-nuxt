@@ -163,7 +163,7 @@ export const useTenant = () => {
             location:    c.hero?.location     || '',
           },
           about: { ...DEFAULT.content.about, ...(c.about || {}) },
-          stats: c.stats?.length ? c.stats : DEFAULT.content.stats,
+          stats: c.about?.stats?.length ? c.about.stats : DEFAULT.content.stats,
           footer: { ...DEFAULT.content.footer, ...(c.footer || {}) },
         },
         services: Array.isArray(s) && s.length ? s : DEFAULT.services,
