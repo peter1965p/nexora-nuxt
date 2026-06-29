@@ -9,6 +9,14 @@ const gradientStyle = computed(() =>
   `background:linear-gradient(to bottom, ${gradient.value.from}, ${gradient.value.via}, ${gradient.value.to});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`
 )
 
+const titleSize = computed(() => ({
+  sm:  'clamp(2rem, 6vw, 4rem)',
+  md:  'clamp(2.5rem, 7vw, 6rem)',
+  lg:  'clamp(3.5rem, 10vw, 8rem)',
+  xl:  'clamp(4.5rem, 12vw, 11rem)',
+  xxl: 'clamp(5rem, 14vw, 14rem)',
+}[tenant.value.branding.heroTitleSize || 'lg'] || 'clamp(3.5rem, 10vw, 8rem)'))
+
 const desc = computed(() => (hero.value as any).desc || '')
 
 // Neural canvas
@@ -129,7 +137,7 @@ onUnmounted(() => { if (stopNeural) stopNeural() })
           </div>
 
           <h1 class="font-black tracking-[-0.06em] select-none uppercase"
-              style="font-size:clamp(3.5rem, 10vw, 8rem);line-height:0.9;overflow:visible;padding-top:0.45em">
+              :style="`font-size:${titleSize};line-height:0.9;overflow:visible;padding-top:0.45em`">
             <span :style="gradientStyle" style="filter:drop-shadow(0 0 70px rgba(234,88,12,0.45))">
               {{ tenant.companyName }}
             </span>

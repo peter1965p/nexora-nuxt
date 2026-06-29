@@ -5,6 +5,7 @@ export interface NexoraBranding {
   logoUrl?: string
   faviconUrl?: string
   heroBackground?: string
+  heroTitleSize?: string
   heroGradient?: { from: string; via: string; to: string }
   servicesLayout?: string
 }
