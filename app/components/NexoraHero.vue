@@ -1,20 +1,106 @@
 <script setup lang="ts">
 const { tenant } = useTenant()
-const accent = computed(() => tenant.value.branding.primaryColor || '#f97316')
-const hero   = computed(() => tenant.value.content.hero || {})
+const accent   = computed(() => tenant.value.branding.primaryColor || '#f97316')
+const hero     = computed(() => tenant.value.content.hero || {})
+const bg       = computed(() => tenant.value.branding.heroBackground || 'grid')
+const gradient = computed(() => tenant.value.branding.heroGradient || { from: '#fb923c', via: '#ea580c', to: '#431407' })
+
+const gradientStyle = computed(() =>
+  `background:linear-gradient(to bottom, ${gradient.value.from}, ${gradient.value.via}, ${gradient.value.to});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`
+)
+
+// Neural canvas
+const canvasRef = ref<HTMLCanvasElement | null>(null)
+let animId = 0
+
+function startNeural(canvas: HTMLCanvasElement) {
+  const ctx = canvas.getContext('2d')!
+  const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight }
+  resize()
+  window.addEventListener('resize', resize)
+
+  const pts = Array.from({ length: 70 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+  }))
+
+  const hex2 = (n: number) => Math.floor(n * 255).toString(16).padStart(2, '0')
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    for (const p of pts) {
+      p.x += p.vx; p.y += p.vy
+      if (p.x < 0 || p.x > canvas.width)  p.vx *= -1
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1
+    }
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y
+        const d  = Math.sqrt(dx * dx + dy * dy)
+        if (d < 140) {
+          const a = (1 - d / 140) * 0.35
+          ctx.beginPath()
+          ctx.strokeStyle = accent.value + hex2(a)
+          ctx.lineWidth   = 0.6
+          ctx.moveTo(pts[i].x, pts[i].y)
+          ctx.lineTo(pts[j].x, pts[j].y)
+          ctx.stroke()
+        }
+      }
+      ctx.beginPath()
+      ctx.fillStyle = accent.value + '88'
+      ctx.arc(pts[i].x, pts[i].y, 1.5, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    animId = requestAnimationFrame(draw)
+  }
+  draw()
+  return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize) }
+}
+
+let stopNeural: (() => void) | null = null
+
+watch([bg, canvasRef], ([newBg, canvas]) => {
+  if (stopNeural) { stopNeural(); stopNeural = null }
+  if (newBg === 'neural' && canvas) stopNeural = startNeural(canvas)
+}, { immediate: true })
+
+onUnmounted(() => { if (stopNeural) stopNeural() })
 </script>
 
 <template>
   <section class="relative w-full min-h-screen flex items-center" style="background:var(--nx-bg)">
-    <!-- Grid background -->
-    <div class="absolute inset-0 pointer-events-none" style="background-image:linear-gradient(color-mix(in srgb, var(--nx-accent) 3%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--nx-accent) 3%, transparent) 1px,transparent 1px);background-size:48px 48px"></div>
+
+    <!-- Background -->
+    <!-- Grid -->
+    <div v-if="bg === 'grid'" class="absolute inset-0 pointer-events-none"
+      style="background-image:linear-gradient(color-mix(in srgb, var(--nx-accent) 4%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--nx-accent) 4%, transparent) 1px,transparent 1px);background-size:48px 48px"></div>
+
+    <!-- Dots -->
+    <div v-else-if="bg === 'dots'" class="absolute inset-0 pointer-events-none"
+      style="background-image:radial-gradient(color-mix(in srgb, var(--nx-accent) 25%, transparent) 1px, transparent 1px);background-size:32px 32px"></div>
+
+    <!-- Neural -->
+    <canvas v-else-if="bg === 'neural'" ref="canvasRef"
+      class="absolute inset-0 w-full h-full pointer-events-none" />
+
+    <!-- Waves -->
+    <div v-else-if="bg === 'waves'" class="absolute inset-0 pointer-events-none overflow-hidden">
+      <svg class="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 320" preserveAspectRatio="none" style="height:40%">
+        <path :fill="accent + '11'" d="M0,192L60,181.3C120,171,240,149,360,154.7C480,160,600,192,720,192C840,192,960,160,1080,149.3C1200,139,1320,149,1380,154.7L1440,160L1440,320L0,320Z"/>
+        <path :fill="accent + '08'" d="M0,256L60,240C120,224,240,192,360,186.7C480,181,600,203,720,213.3C840,224,960,213,1080,197.3C1200,181,1320,181,1380,181.3L1440,181L1440,320L0,320Z"/>
+      </svg>
+    </div>
+
+    <!-- Solid = no bg element -->
 
     <div class="relative z-10 w-full px-6 md:px-16 pt-32 pb-20 max-w-7xl mx-auto">
       <div class="flex flex-col md:flex-row md:items-center gap-12 md:gap-20">
 
         <!-- Left: company name -->
         <div class="flex-1 min-w-0">
-          <!-- Badge -->
           <div class="flex items-center gap-3 mb-6 text-[10px] uppercase tracking-[0.3em]" :style="{ color: accent }">
             <span class="relative flex h-2 w-2 flex-shrink-0">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :style="{ background: accent }"></span>
@@ -25,13 +111,13 @@ const hero   = computed(() => tenant.value.content.hero || {})
 
           <h1 class="font-black tracking-[-0.06em] select-none uppercase"
               style="font-size:clamp(3.5rem, 10vw, 8rem);line-height:0.9;overflow:visible;padding-top:0.15em">
-            <span class="bg-gradient-to-b from-orange-200 via-orange-500 to-orange-950 bg-clip-text text-transparent drop-shadow-[0_0_70px_rgba(234,88,12,0.5)]">
+            <span :style="gradientStyle" style="filter:drop-shadow(0 0 70px rgba(234,88,12,0.45))">
               {{ tenant.companyName }}
             </span>
           </h1>
         </div>
 
-        <!-- Right: subheadline + description + CTA + stats -->
+        <!-- Right -->
         <div class="md:w-80 lg:w-96 flex-shrink-0 flex flex-col gap-6">
           <div>
             <p v-if="hero.subheadline" class="text-xl font-black italic uppercase mb-3" style="color:var(--nx-text)">
@@ -42,7 +128,6 @@ const hero   = computed(() => tenant.value.content.hero || {})
             </p>
           </div>
 
-          <!-- Stats -->
           <div v-if="tenant.content.stats?.length"
                class="gap-px overflow-hidden rounded-sm border"
                :class="tenant.content.stats.length === 1 ? 'grid grid-cols-1' : 'grid grid-cols-2'"
@@ -53,7 +138,6 @@ const hero   = computed(() => tenant.value.content.hero || {})
             </div>
           </div>
 
-          <!-- CTA -->
           <NuxtLink to="/kontakt"
             class="inline-block text-center text-white text-[11px] font-bold uppercase tracking-widest px-6 py-3 rounded-sm transition-opacity hover:opacity-90"
             :style="{ background: accent }">

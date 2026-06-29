@@ -2,6 +2,11 @@ export interface NexoraBranding {
   primaryColor?: string
   companyName?: string
   tagline?: string
+  logoUrl?: string
+  faviconUrl?: string
+  heroBackground?: string
+  heroGradient?: { from: string; via: string; to: string }
+  servicesLayout?: string
 }
 
 export interface NexoraFooter {
@@ -97,7 +102,7 @@ function applyTheme(themeKey: string, accentOverride?: string) {
 const DEFAULT: TenantData = {
   tenantId: '',
   companyName: 'Mein Unternehmen',
-  branding: { primaryColor: '#f97316' },
+  branding: { primaryColor: '#f97316', heroBackground: 'grid', heroGradient: { from: '#fb923c', via: '#ea580c', to: '#431407' }, servicesLayout: 'auto' },
   content: {
     hero: { headline: 'Willkommen', subheadline: 'Ihr zuverlässiger Partner', cta: 'Kontakt aufnehmen' },
     about: { text: 'Wir sind ein modernes Unternehmen.' },

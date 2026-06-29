@@ -1,6 +1,20 @@
 <script setup lang="ts">
 const { tenant, resolved } = useTenant()
 const accent = computed(() => tenant.value.branding.primaryColor || '#2563eb')
+
+const gridClass = computed(() => {
+  const n      = tenant.value.services.length
+  const layout = tenant.value.branding.servicesLayout || 'auto'
+  if (layout === '2')   return 'grid-cols-1 md:grid-cols-2'
+  if (layout === '3')   return 'grid-cols-1 md:grid-cols-3'
+  if (layout === '4')   return 'grid-cols-1 md:grid-cols-4'
+  if (layout === '2x2') return 'grid-cols-1 md:grid-cols-2'
+  // auto
+  if (n <= 2)  return 'grid-cols-1 md:grid-cols-2'
+  if (n === 4) return 'grid-cols-1 md:grid-cols-2'
+  if (n >= 5)  return 'grid-cols-1 md:grid-cols-3'
+  return 'grid-cols-1 md:grid-cols-3'
+})
 </script>
 
 <template>
@@ -8,7 +22,7 @@ const accent = computed(() => tenant.value.branding.primaryColor || '#2563eb')
     <p class="text-[10px] uppercase tracking-[0.3em] mb-4" :style="{ color: accent }">Leistungen</p>
     <h2 class="text-4xl font-black italic uppercase mb-12">Was wir anbieten</h2>
 
-    <div v-if="tenant.services.length" class="grid grid-cols-1 md:grid-cols-3 border border-white/5">
+    <div v-if="tenant.services.length" class="grid border border-white/5" :class="gridClass">
       <div v-for="(svc, i) in tenant.services" :key="svc.id"
            class="p-10 transition-all"
            :style="{ borderRight: i < tenant.services.length - 1 ? '1px solid rgba(255,255,255,.05)' : 'none' }">

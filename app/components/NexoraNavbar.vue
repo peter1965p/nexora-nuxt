@@ -7,12 +7,16 @@ const accent = computed(() => tenant.value.branding.primaryColor || '#2563eb')
 <template>
   <header class="fixed top-0 left-0 w-full z-[100] px-6 py-4 flex justify-between items-center backdrop-blur-md" style="background:color-mix(in srgb, var(--nx-bg) 80%, transparent);border-bottom:1px solid color-mix(in srgb, var(--nx-border) 50%, transparent)">
     <a href="/" class="flex items-center gap-2 group">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" :stroke="accent" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
-      </svg>
-      <span class="text-sm font-black italic uppercase tracking-tighter" style="color:var(--nx-text)">
-        {{ tenant.companyName }}
-      </span>
+      <img v-if="tenant.branding.logoUrl" :src="tenant.branding.logoUrl" :alt="tenant.companyName"
+        style="height:28px;width:auto;object-fit:contain;max-width:140px" />
+      <template v-else>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" :stroke="accent" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+        </svg>
+        <span class="text-sm font-black italic uppercase tracking-tighter" style="color:var(--nx-text)">
+          {{ tenant.companyName }}
+        </span>
+      </template>
     </a>
 
     <nav class="hidden md:flex items-center gap-8">

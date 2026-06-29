@@ -8,6 +8,9 @@ onMounted(async () => {
 useHead({
   title: computed(() => tenant.value.companyName || 'Nexora'),
   htmlAttrs: { lang: 'de' },
+  link: computed(() => tenant.value.branding.faviconUrl ? [
+    { rel: 'icon', href: tenant.value.branding.faviconUrl }
+  ] : []),
 })
 </script>
 
