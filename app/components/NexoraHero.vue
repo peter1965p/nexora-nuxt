@@ -9,6 +9,8 @@ const gradientStyle = computed(() =>
   `background:linear-gradient(to bottom, ${gradient.value.from}, ${gradient.value.via}, ${gradient.value.to});-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`
 )
 
+const desc = computed(() => (hero.value as any).desc || '')
+
 // Neural canvas
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 let animId = 0
@@ -76,7 +78,7 @@ onUnmounted(() => { if (stopNeural) stopNeural() })
     <!-- Background -->
     <!-- Grid -->
     <div v-if="bg === 'grid'" class="absolute inset-0 pointer-events-none"
-      style="background-image:linear-gradient(color-mix(in srgb, var(--nx-accent) 4%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--nx-accent) 4%, transparent) 1px,transparent 1px);background-size:48px 48px"></div>
+      style="background-image:linear-gradient(color-mix(in srgb, var(--nx-accent) 8%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--nx-accent) 8%, transparent) 1px,transparent 1px);background-size:48px 48px"></div>
 
     <!-- Dots -->
     <div v-else-if="bg === 'dots'" class="absolute inset-0 pointer-events-none"
@@ -120,11 +122,14 @@ onUnmounted(() => { if (stopNeural) stopNeural() })
         <!-- Right -->
         <div class="md:w-80 lg:w-96 flex-shrink-0 flex flex-col gap-6">
           <div>
-            <p v-if="hero.subheadline" class="text-xl font-black italic uppercase mb-3" style="color:var(--nx-text)">
+            <p v-if="hero.headline" class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--nx-muted)">
+              {{ hero.headline }}
+            </p>
+            <p v-if="hero.subheadline" class="text-2xl font-black italic uppercase mb-3" :style="{ color: accent }">
               {{ hero.subheadline }}
             </p>
-            <p v-if="hero.headline" class="text-sm leading-relaxed" style="color:var(--nx-muted)">
-              {{ hero.headline }}
+            <p v-if="desc" class="text-sm leading-relaxed mt-1" style="color:var(--nx-muted)">
+              {{ desc }}
             </p>
           </div>
 

@@ -16,7 +16,7 @@ export interface NexoraFooter {
 }
 
 export interface NexoraContent {
-  hero?: { headline?: string; subheadline?: string; cta?: string }
+  hero?: { headline?: string; subheadline?: string; desc?: string; location?: string; cta?: string }
   about?: { text?: string }
   stats?: Array<{ value: string; label: string }>
   footer?: NexoraFooter
@@ -167,10 +167,11 @@ export const useTenant = () => {
         branding: { ...DEFAULT.branding, ...b },
         content: {
           hero: {
-            subheadline: c.hero?.subline      || c.hero?.subheadline || DEFAULT.content.hero?.subheadline,
-            headline:    c.hero?.desc         || c.hero?.headline    || DEFAULT.content.hero?.headline,
-            cta:         c.hero?.ctaLabel     || c.hero?.cta         || DEFAULT.content.hero?.cta,
-            location:    c.hero?.location     || '',
+            headline:    c.hero?.headline    || DEFAULT.content.hero?.headline,
+            subheadline: c.hero?.subline     || c.hero?.subheadline || DEFAULT.content.hero?.subheadline,
+            desc:        c.hero?.desc        || '',
+            location:    c.hero?.location    || '',
+            cta:         c.hero?.ctaLabel    || c.hero?.cta         || DEFAULT.content.hero?.cta,
           },
           about: { ...DEFAULT.content.about, ...(c.about || {}) },
           stats: c.about?.stats?.length ? c.about.stats : DEFAULT.content.stats,
