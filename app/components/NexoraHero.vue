@@ -5,7 +5,7 @@ const hero   = computed(() => tenant.value.content.hero || {})
 </script>
 
 <template>
-  <section class="relative w-full min-h-screen flex items-center overflow-hidden" style="background:var(--nx-bg)">
+  <section class="relative w-full min-h-screen flex items-center" style="background:var(--nx-bg)">
     <!-- Grid background -->
     <div class="absolute inset-0 pointer-events-none" style="background-image:linear-gradient(color-mix(in srgb, var(--nx-accent) 3%, transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb, var(--nx-accent) 3%, transparent) 1px,transparent 1px);background-size:48px 48px"></div>
 
@@ -43,7 +43,10 @@ const hero   = computed(() => tenant.value.content.hero || {})
           </div>
 
           <!-- Stats -->
-          <div v-if="tenant.content.stats?.length" class="grid grid-cols-2 gap-px overflow-hidden rounded-sm border" style="border-color:var(--nx-border);background:var(--nx-border)">
+          <div v-if="tenant.content.stats?.length"
+               class="gap-px overflow-hidden rounded-sm border"
+               :class="tenant.content.stats.length === 1 ? 'grid grid-cols-1' : 'grid grid-cols-2'"
+               style="border-color:var(--nx-border);background:var(--nx-border)">
             <div v-for="stat in tenant.content.stats" :key="stat.label" class="px-4 py-3" style="background:var(--nx-surface)">
               <div class="text-lg font-black" style="color:var(--nx-text)">{{ stat.value }}</div>
               <div class="text-[9px] tracking-widest mt-0.5 uppercase" style="color:var(--nx-muted)">{{ stat.label }}</div>
