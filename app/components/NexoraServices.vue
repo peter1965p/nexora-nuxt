@@ -12,7 +12,10 @@ const accent = computed(() => tenant.value.branding.primaryColor || '#2563eb')
       <div v-for="(svc, i) in tenant.services" :key="svc.id"
            class="p-10 transition-all"
            :style="{ borderRight: i < tenant.services.length - 1 ? '1px solid rgba(255,255,255,.05)' : 'none' }">
-        <div class="mb-4 text-2xl font-black italic" :style="{ color: accent }">{{ String(i + 1).padStart(2, '0') }}</div>
+        <div class="mb-4" :style="{ color: svc.color || accent }">
+          <span v-if="svc.icon" class="text-3xl leading-none">{{ svc.icon }}</span>
+          <span v-else class="text-2xl font-black italic">{{ String(i + 1).padStart(2, '0') }}</span>
+        </div>
         <h3 class="text-[11px] font-bold uppercase tracking-widest mb-4">{{ svc.title }}</h3>
         <p class="text-slate-500 text-[10px] leading-relaxed mb-6">{{ svc.description }}</p>
         <ul class="space-y-1">

@@ -19,6 +19,8 @@ export interface NexoraContent {
 
 export interface NexoraService {
   id: string
+  icon?: string
+  color?: string
   title: string
   description: string
   features: string[]
