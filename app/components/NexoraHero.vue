@@ -20,9 +20,8 @@ const hero   = computed(() => tenant.value.content.hero || {})
       </div>
 
       <!-- Company name -->
-      <h1 class="font-black tracking-[-0.08em] leading-none uppercase mb-6"
-          style="font-size:clamp(3rem,10vw,7rem)">
-        <span :style="`background:linear-gradient(to bottom,#fff,rgba(255,255,255,.5));-webkit-background-clip:text;-webkit-text-fill-color:transparent`">
+      <h1 class="text-[5rem] md:text-[9rem] font-black tracking-[-0.08em] leading-none select-none uppercase mb-6">
+        <span class="bg-gradient-to-b from-orange-200 via-orange-500 to-orange-950 bg-clip-text text-transparent drop-shadow-[0_0_70px_rgba(234,88,12,0.5)]">
           {{ tenant.companyName }}
         </span>
       </h1>
