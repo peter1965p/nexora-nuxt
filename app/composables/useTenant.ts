@@ -171,7 +171,7 @@ export const useTenant = () => {
           stats: c.about?.stats?.length ? c.about.stats : DEFAULT.content.stats,
           footer: { ...DEFAULT.content.footer, ...(c.footer || {}) },
         },
-        services: Array.isArray(s) && s.length ? s : DEFAULT.services,
+        services: Array.isArray(s?.services) && s.services.length ? s.services : DEFAULT.services,
         contact: { ...DEFAULT.contact, ...k },
         pages: pg.pages || [],
         theme,
