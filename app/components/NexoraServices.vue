@@ -33,11 +33,10 @@ const accent = computed(() => tenant.value.branding.primaryColor || '#f97316')
           onmouseover="this.style.background='var(--nx-surface)'"
           onmouseout="this.style.background='var(--nx-bg)'">
 
-          <!-- Icon -->
+          <!-- Icon (emoji or fallback number) -->
           <div style="width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px"
             :style="{ background: (svc.color || accent) + '18' }">
-            <i v-if="svc.icon" :class="svc.icon"
-              :style="{ color: svc.color || accent, fontSize: '20px' }"></i>
+            <span v-if="svc.icon" style="font-size:22px;line-height:1">{{ svc.icon }}</span>
             <span v-else style="font-size:15px;font-weight:800"
               :style="{ color: svc.color || accent }">{{ String(i + 1).padStart(2, '0') }}</span>
           </div>
