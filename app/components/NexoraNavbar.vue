@@ -54,7 +54,7 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
           onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
           Kontakt
         </NuxtLink>
-        <NuxtLink v-for="pg in pages" :key="pg.slug" :to="`/${pg.slug}`"
+        <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
           style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
           onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
@@ -92,7 +92,7 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
         {{ link[1] }}
       </NuxtLink>
-      <NuxtLink v-for="pg in pages" :key="pg.slug" :to="`/${pg.slug}`"
+      <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
         {{ pg.title }}
       </NuxtLink>
