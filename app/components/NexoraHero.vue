@@ -4,12 +4,18 @@ const accent   = computed(() => tenant.value.branding.primaryColor || '#f97316')
 const hero     = computed(() => tenant.value.content.hero || {})
 const bg       = computed(() => tenant.value.branding.heroBackground || 'grid')
 
-// Parse headline: "Wir bauen **wirklich** gute Software." → before / highlight / after
+// headline = "Wir bauen Software die"  → white
+// subheadline = "wirklich skaliert."   → first word gets oval+accent, rest gets gradient
 const parsed = computed(() => {
-  const h = (hero.value as any).headline || 'Software, die **wirklich** skaliert.'
-  const m = h.match(/^([\s\S]*?)\*\*([\s\S]*?)\*\*([\s\S]*)$/)
-  if (m) return { before: m[1].trimEnd(), highlight: m[2], after: m[3].trimStart() }
-  return { before: h, highlight: '', after: '' }
+  const sub = (hero.value as any).subheadline || ''
+  const words = sub.trim().split(/\s+/)
+  const oval = words[0] || ''
+  const rest = words.slice(1).join(' ')
+  return {
+    headline:  (hero.value as any).headline || 'Software, die',
+    oval,
+    rest,
+  }
 })
 
 // Stack items for code editor
@@ -33,7 +39,7 @@ const codeProvider = computed(() => {
     <!-- Radial glow -->
     <div style="position:absolute;top:-200px;left:-200px;width:600px;height:600px;border-radius:50%;pointer-events:none;opacity:.12;filter:blur(80px)"
       :style="{ background: accent }"></div>
-    <div style="position:absolute;bottom:-200px;right:0;width:500px;height:500px;border-radius:50%;pointer-events:none;opacity:.08;filter:blur(100px);background:#22c55e"></div>
+    <div style="position:absolute;bottom:-200px;right:0;width:500px;height:500px;border-radius:50%;pointer-events:none;opacity:.06;filter:blur(100px)" :style="{ background: accent }"></div>
 
     <!-- Content -->
     <div style="position:relative;z-index:10;width:100%;max-width:1200px;margin:0 auto;padding:100px 24px 60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center">
@@ -51,22 +57,21 @@ const codeProvider = computed(() => {
 
         <!-- Headline -->
         <h1 style="margin:0 0 24px;line-height:1.08;font-weight:800;letter-spacing:-.03em;font-size:clamp(2.8rem,5.5vw,4.8rem)">
-          <!-- Before highlight -->
-          <span v-if="parsed.before" style="color:var(--nx-text);display:block">{{ parsed.before }}</span>
+          <!-- Headline (white) -->
+          <span style="color:var(--nx-text);display:block">{{ parsed.headline }}</span>
 
-          <!-- Highlight word with red oval -->
-          <span v-if="parsed.highlight" style="position:relative;display:inline-block;color:var(--nx-text)" :style="{ color: accent }">
-            {{ parsed.highlight }}
-            <!-- Red oval SVG -->
-            <svg style="position:absolute;left:-10%;top:-15%;width:120%;height:130%;pointer-events:none" viewBox="0 0 120 50" preserveAspectRatio="none">
-              <ellipse cx="60" cy="25" rx="57" ry="22" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="0" transform="rotate(-3 60 25)" opacity=".9"/>
-            </svg>
-          </span>
-
-          <!-- After highlight -->
-          <span v-if="parsed.after" style="display:block"
-            :style="`background:linear-gradient(135deg,${accent},${accent}aa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`">
-            {{ parsed.after }}
+          <!-- Subheadline: first word = oval + accent, rest = gradient -->
+          <span style="display:block">
+            <span v-if="parsed.oval" style="position:relative;display:inline-block" :style="{ color: accent }">
+              {{ parsed.oval }}
+              <svg style="position:absolute;left:-10%;top:-10%;width:120%;height:130%;pointer-events:none" viewBox="0 0 120 50" preserveAspectRatio="none">
+                <ellipse cx="60" cy="25" rx="57" ry="22" fill="none" stroke="#ef4444" stroke-width="1.8" transform="rotate(-3 60 25)" opacity=".85"/>
+              </svg>
+            </span>
+            <span v-if="parsed.rest"
+              :style="`background:linear-gradient(135deg,${accent},${accent}99);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`">
+              {{ ' ' + parsed.rest }}
+            </span>
           </span>
         </h1>
 
@@ -94,16 +99,14 @@ const codeProvider = computed(() => {
         </div>
       </div>
 
-      <!-- RIGHT: Code editor in green circle -->
+      <!-- RIGHT: Code editor floating card -->
       <div style="display:flex;align-items:center;justify-content:center;position:relative">
-        <!-- Green circle -->
-        <div style="position:relative;width:min(420px,90vw);aspect-ratio:1;border-radius:50%;border:1.5px solid #22c55e;display:flex;align-items:center;justify-content:center;padding:36px;box-sizing:border-box">
+        <!-- Glow behind card -->
+        <div style="position:absolute;inset:-40px;border-radius:24px;opacity:.15;background:var(--nx-accent, #f97316);filter:blur(60px);pointer-events:none" :style="{ background: accent }"></div>
 
-          <!-- Subtle green glow on circle -->
-          <div style="position:absolute;inset:0;border-radius:50%;opacity:.06;background:#22c55e;filter:blur(20px);pointer-events:none"></div>
-
+        <div style="position:relative;width:100%;max-width:480px">
           <!-- Code editor card -->
-          <div style="width:100%;background:#0d1117;border-radius:12px;border:1px solid #1e293b;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+          <div style="width:100%;background:#0d1117;border-radius:14px;border:1px solid #1e293b;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04);transform:perspective(1000px) rotateY(-4deg) rotateX(2deg)">
             <!-- Title bar -->
             <div style="padding:10px 14px;background:#161b22;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:6px">
               <div style="width:10px;height:10px;border-radius:50%;background:#ef4444"></div>
