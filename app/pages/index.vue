@@ -7,6 +7,7 @@
     <main>
       <NexoraHero />
       <NexoraStack />
+      <NexoraClients />
     </main>
     <NexoraFooter />
   </div>

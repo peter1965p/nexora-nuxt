@@ -58,6 +58,16 @@ export interface NexoraStackConfig {
   legend?: Record<string, string>
 }
 
+export interface NexoraClientItem {
+  name: string
+}
+
+export interface NexoraClientsConfig {
+  enabled: boolean
+  items: NexoraClientItem[]
+  title?: string
+}
+
 export interface TenantData {
   tenantId: string
   companyName: string
@@ -68,6 +78,7 @@ export interface TenantData {
   pages: NexoraPage[]
   theme: string
   stack: NexoraStackConfig
+  clients: NexoraClientsConfig
 }
 
 const THEMES: Record<string, Record<string, string>> = {
@@ -127,7 +138,8 @@ const DEFAULT: TenantData = {
   contact: {},
   pages: [],
   theme: 'midnight',
-  stack: { enabled: false, items: [], title: 'TECH STACK', legend: {} },
+  stack:   { enabled: false, items: [], title: 'TECH STACK', legend: {} },
+  clients: { enabled: false, items: [], title: 'REFERENZEN' },
 }
 
 export const useTenant = () => {
@@ -160,13 +172,14 @@ export const useTenant = () => {
     if (!tenantId) { resolved.value = true; return }
 
     try {
-      const [branding, content, services, contact, pagesRes, stackRes] = await Promise.allSettled([
+      const [branding, content, services, contact, pagesRes, stackRes, clientsRes] = await Promise.allSettled([
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/branding`),
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/content`),
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/services`),
         $fetch<NexoraContact>(`${apiUrl}/api/public/${tenantId}/contact`),
         $fetch<{ pages: NexoraPage[]; theme: string }>(`${apiUrl}/api/public/${tenantId}/pages`),
         $fetch<NexoraStackConfig>(`${apiUrl}/api/public/${tenantId}/stack`),
+        $fetch<NexoraClientsConfig>(`${apiUrl}/api/public/${tenantId}/clients`),
       ])
 
       const b  = branding.status  === 'fulfilled' ? branding.value  : {}
@@ -174,7 +187,8 @@ export const useTenant = () => {
       const s  = services.status  === 'fulfilled' ? services.value  : []
       const k  = contact.status   === 'fulfilled' ? contact.value   : {}
       const pg = pagesRes.status  === 'fulfilled' ? pagesRes.value  : { pages: [], theme: 'midnight' }
-      const st = stackRes.status  === 'fulfilled' ? stackRes.value  : null
+      const st = stackRes.status   === 'fulfilled' ? stackRes.value   : null
+      const cl = clientsRes.status === 'fulfilled' ? clientsRes.value : null
 
       const theme = pg.theme || 'midnight'
 
@@ -203,6 +217,11 @@ export const useTenant = () => {
           items:   st?.items   || [],
           title:   st?.title   || 'TECH STACK',
           legend:  st?.legend  || {},
+        },
+        clients: {
+          enabled: cl?.enabled ?? false,
+          items:   cl?.items   || [],
+          title:   cl?.title   || 'REFERENZEN',
         },
       }
 
