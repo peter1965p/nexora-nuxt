@@ -15,5 +15,7 @@ useHead({
 </script>
 
 <template>
-  <NuxtPage />
+  <div style="font-family:'Inter',system-ui,-apple-system,sans-serif">
+    <NuxtPage />
+  </div>
 </template>
