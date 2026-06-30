@@ -8,6 +8,8 @@ export interface NexoraBranding {
   heroTitleSize?: string
   heroGradient?: { from: string; via: string; to: string }
   servicesLayout?: string
+  heroMediaType?: 'code' | 'image'
+  heroImageUrl?: string
 }
 
 export interface NexoraFooter {
@@ -225,7 +227,7 @@ export const useTenant = () => {
       tenant.value = {
         tenantId,
         companyName: b.companyName || DEFAULT.companyName,
-        branding: { ...DEFAULT.branding, ...b },
+        branding: { ...DEFAULT.branding, ...b, heroMediaType: b.heroMediaType || 'code', heroImageUrl: b.heroImageUrl || '' },
         content: {
           hero: {
             headline:    c.hero?.headline    || DEFAULT.content.hero?.headline,
