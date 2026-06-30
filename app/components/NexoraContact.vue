@@ -196,8 +196,12 @@ async function submit() {
   align-items: start;
 }
 @media (max-width: 900px) {
-  .contact-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
-  .form-row     { grid-template-columns: 1fr !important; }
+  .contact-grid        { grid-template-columns: 1fr !important; gap: 40px !important; }
+  .form-row            { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 768px) {
+  section:first-child  { padding: 80px 16px 40px !important; }
+  section:last-child   { padding: 32px 16px 48px !important; }
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; }

@@ -112,4 +112,7 @@ const groupedItems = computed(() => {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
+@media (max-width: 600px) {
+  section > div:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; padding: 12px 16px 10px !important; }
+}
 </style>

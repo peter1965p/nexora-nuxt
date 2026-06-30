@@ -73,6 +73,8 @@ const accent = computed(() => tenant.value.branding.primaryColor || '#f97316')
   align-items: start;
 }
 @media (max-width: 768px) {
-  .about-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+  .about-grid          { grid-template-columns: 1fr !important; gap: 40px !important; }
+  section:first-child  { padding: 80px 16px 40px !important; }
+  section:last-child   { padding: 32px 16px 48px !important; }
 }
 </style>

@@ -73,3 +73,10 @@ const accent = computed(() => tenant.value.branding.primaryColor || '#f97316')
     </section>
   </div>
 </template>
+
+<style scoped>
+@media (max-width: 768px) {
+  section:first-child { padding: 80px 16px 40px !important; }
+  section:last-child  { padding: 32px 16px 48px !important; }
+}
+</style>

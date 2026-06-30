@@ -209,7 +209,10 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
     </div>
 
     <!-- Scroll hint -->
-    <div style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.35">
+    <div style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.35;cursor:pointer;transition:opacity .2s"
+      onmouseover="this.style.opacity='0.65'"
+      onmouseout="this.style.opacity='0.35'"
+      @click="$el.closest('section')?.nextElementSibling?.scrollIntoView({ behavior: 'smooth' }) || window.scrollBy({ top: window.innerHeight * 0.85, behavior: 'smooth' })">
       <span style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--nx-muted);font-family:'Inter',sans-serif">Scroll</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--nx-muted);animation:bounce 2s infinite"><polyline points="6 9 12 15 18 9"/></svg>
     </div>

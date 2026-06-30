@@ -90,7 +90,8 @@ const pages   = computed(() => tenant.value.pages || [])
   0%, 100% { opacity: 1; }
   50%       { opacity: .4; }
 }
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   footer > div > div:first-child { grid-template-columns: 1fr !important; gap: 28px !important; }
+  footer > div > div:last-child  { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
 }
 </style>
