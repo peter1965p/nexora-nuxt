@@ -23,7 +23,7 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
             {{ (tenant.companyName || 'N')[0].toUpperCase() }}
           </div>
           <span style="font-size:17px;font-weight:700;color:var(--nx-text);letter-spacing:-.02em">
-            {{ (tenant.companyName || 'nexora').toLowerCase() }}
+            {{ tenant.companyName || 'Nexora' }}
           </span>
         </template>
       </NuxtLink>

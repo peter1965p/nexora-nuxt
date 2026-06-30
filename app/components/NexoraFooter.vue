@@ -20,7 +20,7 @@ const pages   = computed(() => tenant.value.pages || [])
               :style="{ background: accent }">
               {{ company[0].toUpperCase() }}
             </div>
-            <span style="font-size:16px;font-weight:700;color:var(--nx-text);letter-spacing:-.02em">{{ company.toLowerCase() }}</span>
+            <span style="font-size:16px;font-weight:700;color:var(--nx-text);letter-spacing:-.02em">{{ company }}</span>
           </div>
           <p style="font-size:13px;line-height:1.6;color:var(--nx-muted);margin:0;max-width:220px">
             {{ tenant.content.footer?.tagline || 'Digitale Lösungen für Unternehmen, die wachsen wollen.' }}
