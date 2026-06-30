@@ -1,4 +1,16 @@
 <script setup lang="ts">
+const { tenant } = useTenant()
+
+const SECTION_MAP: Record<string, string> = {
+  stack:   'NexoraStack',
+  clients: 'NexoraClients',
+  github:  'NexoraGitHub',
+}
+
+const orderedSections = computed(() =>
+  (tenant.value.sectionOrder || ['stack', 'clients', 'github'])
+    .filter(key => SECTION_MAP[key])
+)
 </script>
 
 <template>
@@ -6,9 +18,11 @@
     <NexoraNavbar />
     <main>
       <NexoraHero />
-      <NexoraStack />
-      <NexoraClients />
-      <NexoraGitHub />
+      <component
+        v-for="section in orderedSections"
+        :key="section"
+        :is="SECTION_MAP[section]"
+      />
     </main>
     <NexoraFooter />
   </div>

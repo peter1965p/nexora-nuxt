@@ -86,6 +86,10 @@ export interface NexoraGithubConfig {
   repos: NexoraGithubRepo[]
 }
 
+export interface NexoraLayout {
+  sectionOrder: string[]
+}
+
 export interface TenantData {
   tenantId: string
   companyName: string
@@ -98,6 +102,7 @@ export interface TenantData {
   stack: NexoraStackConfig
   clients: NexoraClientsConfig
   github: NexoraGithubConfig
+  sectionOrder: string[]
 }
 
 const THEMES: Record<string, Record<string, string>> = {
@@ -157,9 +162,10 @@ const DEFAULT: TenantData = {
   contact: {},
   pages: [],
   theme: 'midnight',
-  stack:   { enabled: false, items: [], title: 'TECH STACK', legend: {} },
-  clients: { enabled: false, items: [], title: 'REFERENZEN' },
-  github:  { enabled: false, repos: [], title: 'PROJEKTE' },
+  stack:        { enabled: false, items: [], title: 'TECH STACK', legend: {} },
+  clients:      { enabled: false, items: [], title: 'REFERENZEN' },
+  github:       { enabled: false, repos: [], title: 'PROJEKTE' },
+  sectionOrder: ['stack', 'clients', 'github', 'services', 'contact'],
 }
 
 export const useTenant = () => {
@@ -192,7 +198,7 @@ export const useTenant = () => {
     if (!tenantId) { resolved.value = true; return }
 
     try {
-      const [branding, content, services, contact, pagesRes, stackRes, clientsRes, githubRes] = await Promise.allSettled([
+      const [branding, content, services, contact, pagesRes, stackRes, clientsRes, githubRes, layoutRes] = await Promise.allSettled([
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/branding`),
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/content`),
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/services`),
@@ -201,6 +207,7 @@ export const useTenant = () => {
         $fetch<NexoraStackConfig>(`${apiUrl}/api/public/${tenantId}/stack`),
         $fetch<NexoraClientsConfig>(`${apiUrl}/api/public/${tenantId}/clients`),
         $fetch<NexoraGithubConfig>(`${apiUrl}/api/public/${tenantId}/github`),
+        $fetch<NexoraLayout>(`${apiUrl}/api/public/${tenantId}/layout`),
       ])
 
       const b  = branding.status  === 'fulfilled' ? branding.value  : {}
@@ -211,6 +218,7 @@ export const useTenant = () => {
       const st = stackRes.status   === 'fulfilled' ? stackRes.value   : null
       const cl = clientsRes.status === 'fulfilled' ? clientsRes.value : null
       const gh = githubRes.status  === 'fulfilled' ? githubRes.value  : null
+      const lo = layoutRes.status  === 'fulfilled' ? layoutRes.value  : null
 
       const theme = pg.theme || 'midnight'
 
@@ -250,6 +258,7 @@ export const useTenant = () => {
           repos:   gh?.repos   || [],
           title:   gh?.title   || 'PROJEKTE',
         },
+        sectionOrder: lo?.sectionOrder || ['stack', 'clients', 'github', 'services', 'contact'],
       }
 
       applyTheme(theme, b.primaryColor)
