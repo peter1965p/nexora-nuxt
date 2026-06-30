@@ -44,6 +44,12 @@ const pages   = computed(() => tenant.value.pages || [])
               onmouseout="this.style.color='var(--nx-muted)'">
               {{ pg.title }}
             </NuxtLink>
+            <NuxtLink to="/impressum"
+              style="font-size:13px;color:var(--nx-muted);text-decoration:none;transition:color .15s"
+              onmouseover="this.style.color='var(--nx-text)'"
+              onmouseout="this.style.color='var(--nx-muted)'">
+              Impressum
+            </NuxtLink>
           </div>
         </div>
 

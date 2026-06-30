@@ -39,6 +39,9 @@ export interface NexoraContact {
   phone?: string
   address?: string
   region?: string
+  availability?: string
+  legalName?: string
+  vatId?: string
 }
 
 export interface NexoraPage {
