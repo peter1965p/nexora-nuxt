@@ -22,32 +22,25 @@ useHead({
 </script>
 
 <template>
-  <div style="background:var(--nx-bg);color:var(--nx-text);min-height:100vh;font-family:ui-monospace,SFMono-Regular,'SF Mono',Consolas,monospace">
+  <div style="background:var(--nx-bg);color:var(--nx-text);min-height:100vh;font-family:'Inter',system-ui,sans-serif">
     <NexoraNavbar />
 
-    <div v-if="page" class="max-w-3xl mx-auto px-6 md:px-12 py-24">
-      <NuxtLink to="/" class="inline-flex items-center gap-2 text-xs uppercase tracking-widest mb-10 transition-colors" style="color:var(--nx-muted);text-decoration:none">
-        <span>←</span> Zurück
+    <div v-if="page" style="max-width:768px;margin:0 auto;padding:100px 24px 80px">
+      <NuxtLink to="/"
+        style="display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);text-decoration:none;margin-bottom:40px;transition:color .15s"
+        onmouseover="this.style.color='var(--nx-text)'"
+        onmouseout="this.style.color='var(--nx-muted)'">
+        ← Zurück
       </NuxtLink>
-      <div
-        class="prose-content"
-        v-html="renderedContent"
-      />
+      <div class="prose-content" v-html="renderedContent" />
     </div>
 
-    <div v-else class="max-w-3xl mx-auto px-6 py-24 text-center" style="color:var(--nx-muted)">
-      <p class="text-sm">Seite nicht gefunden.</p>
-      <NuxtLink to="/" class="text-xs mt-4 inline-block" style="color:var(--nx-accent)">← Zurück</NuxtLink>
+    <div v-else style="max-width:768px;margin:0 auto;padding:120px 24px;text-align:center;color:var(--nx-muted)">
+      <p style="font-size:14px;margin-bottom:16px">Seite nicht gefunden.</p>
+      <NuxtLink to="/" style="font-size:12px;color:var(--nx-accent);text-decoration:none">← Zurück zur Startseite</NuxtLink>
     </div>
 
-    <footer class="w-full px-6 md:px-16 py-8 border-t" style="border-color:var(--nx-border)">
-      <div class="flex justify-between items-center">
-        <p class="text-[10px] uppercase tracking-[0.4em]" style="color:var(--nx-muted)">
-          © {{ new Date().getFullYear() }} {{ tenant.companyName }}
-        </p>
-        <NuxtLink to="/" class="text-[10px] uppercase tracking-widest" style="color:var(--nx-muted);text-decoration:none">Home</NuxtLink>
-      </div>
-    </footer>
+    <NexoraFooter />
   </div>
 </template>
 

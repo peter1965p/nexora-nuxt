@@ -1,48 +1,75 @@
 <script setup lang="ts">
 const { tenant, resolved } = useTenant()
-const accent = computed(() => tenant.value.branding.primaryColor || '#2563eb')
-
-const gridClass = computed(() => {
-  const n      = tenant.value.services.length
-  const layout = tenant.value.branding.servicesLayout || 'auto'
-  if (layout === '2')   return 'grid-cols-1 md:grid-cols-2'
-  if (layout === '3')   return 'grid-cols-1 md:grid-cols-3'
-  if (layout === '4')   return 'grid-cols-1 md:grid-cols-4'
-  if (layout === '2x2') return 'grid-cols-1 md:grid-cols-2'
-  // auto
-  if (n <= 2)  return 'grid-cols-1 md:grid-cols-2'
-  if (n === 4) return 'grid-cols-1 md:grid-cols-2'
-  if (n >= 5)  return 'grid-cols-1 md:grid-cols-3'
-  return 'grid-cols-1 md:grid-cols-3'
-})
+const accent = computed(() => tenant.value.branding.primaryColor || '#f97316')
 </script>
 
 <template>
-  <section id="services" class="w-full px-6 md:px-16 py-24 border-b border-white/5">
-    <p class="text-[10px] uppercase tracking-[0.3em] mb-4" :style="{ color: accent }">Leistungen</p>
-    <h2 class="text-4xl font-black italic uppercase mb-12">Was wir anbieten</h2>
+  <div style="font-family:'Inter',system-ui,sans-serif">
 
-    <div v-if="tenant.services.length" class="grid border border-white/5" :class="gridClass">
-      <div v-for="(svc, i) in tenant.services" :key="svc.id"
-           class="p-10 transition-all"
-           :style="{ borderRight: i < tenant.services.length - 1 ? '1px solid rgba(255,255,255,.05)' : 'none' }">
-        <div class="mb-4" :style="{ color: svc.color || accent }">
-          <span v-if="svc.icon" class="text-3xl leading-none">{{ svc.icon }}</span>
-          <span v-else class="text-2xl font-black italic">{{ String(i + 1).padStart(2, '0') }}</span>
+    <!-- Page header -->
+    <section style="position:relative;padding:100px 24px 60px;border-bottom:1px solid var(--nx-border);overflow:hidden">
+      <div style="position:absolute;inset:0;pointer-events:none;opacity:.04"
+        :style="`background-image:linear-gradient(${accent} 1px,transparent 1px),linear-gradient(90deg,${accent} 1px,transparent 1px);background-size:52px 52px`"></div>
+      <div style="max-width:1200px;margin:0 auto;position:relative;z-index:1">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:9999px;border:1px solid var(--nx-border);background:var(--nx-surface);margin-bottom:28px">
+          <i class="ti ti-briefcase" :style="{ color: accent, fontSize: '11px' }"></i>
+          <span style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--nx-muted)">Leistungen</span>
         </div>
-        <h3 class="text-[11px] font-bold uppercase tracking-widest mb-4">{{ svc.title }}</h3>
-        <p class="text-slate-500 text-[10px] leading-relaxed mb-6">{{ svc.description }}</p>
-        <ul class="space-y-1">
-          <li v-for="f in svc.features" :key="f" class="flex items-center gap-2 text-[10px] text-slate-400">
-            <span class="w-1 h-1 rounded-full" :style="{ background: accent }"></span>
-            {{ f }}
-          </li>
-        </ul>
+        <h1 style="font-size:clamp(2.4rem,5vw,3.8rem);font-weight:800;letter-spacing:-.03em;margin:0 0 18px;color:var(--nx-text);line-height:1.08">
+          Was wir <span :style="{ color: accent }">anbieten</span>
+        </h1>
+        <p style="font-size:17px;line-height:1.65;color:var(--nx-muted);margin:0;max-width:540px;font-weight:400">
+          Maßgeschneiderte Softwarelösungen — von der ersten Idee bis zum laufenden Betrieb.
+        </p>
       </div>
-    </div>
+    </section>
 
-    <div v-else class="border border-white/5 p-10 text-slate-600 text-[11px]">
-      {{ resolved ? 'Leistungen werden noch konfiguriert.' : 'Leistungen werden geladen...' }}
-    </div>
-  </section>
+    <!-- Services grid -->
+    <section style="max-width:1200px;margin:0 auto;padding:60px 24px 80px">
+      <div v-if="tenant.services.length"
+        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--nx-border);border:1px solid var(--nx-border);border-radius:12px;overflow:hidden">
+        <div v-for="(svc, i) in tenant.services" :key="svc.id"
+          style="background:var(--nx-bg);padding:36px;transition:background .2s;cursor:default"
+          onmouseover="this.style.background='var(--nx-surface)'"
+          onmouseout="this.style.background='var(--nx-bg)'">
+
+          <!-- Icon -->
+          <div style="width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px"
+            :style="{ background: (svc.color || accent) + '18' }">
+            <i v-if="svc.icon" :class="svc.icon"
+              :style="{ color: svc.color || accent, fontSize: '20px' }"></i>
+            <span v-else style="font-size:15px;font-weight:800"
+              :style="{ color: svc.color || accent }">{{ String(i + 1).padStart(2, '0') }}</span>
+          </div>
+
+          <!-- Title -->
+          <h3 style="font-size:16px;font-weight:700;margin:0 0 10px;color:var(--nx-text);letter-spacing:-.01em">
+            {{ svc.title }}
+          </h3>
+
+          <!-- Description -->
+          <p style="font-size:13px;line-height:1.65;color:var(--nx-muted);margin:0 0 20px">
+            {{ svc.description }}
+          </p>
+
+          <!-- Features -->
+          <ul v-if="svc.features?.length"
+            style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px">
+            <li v-for="f in svc.features" :key="f"
+              style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--nx-muted)">
+              <span style="width:4px;height:4px;border-radius:50%;flex-shrink:0"
+                :style="{ background: svc.color || accent }"></span>
+              {{ f }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div v-else
+        style="padding:60px;border:1px solid var(--nx-border);border-radius:12px;text-align:center;color:var(--nx-muted);font-size:14px">
+        {{ resolved ? 'Leistungen werden noch konfiguriert.' : 'Leistungen werden geladen…' }}
+      </div>
+    </section>
+  </div>
 </template>

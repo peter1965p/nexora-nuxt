@@ -31,13 +31,13 @@ const pages   = computed(() => tenant.value.pages || [])
         <div>
           <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:14px">Navigation</div>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <a v-for="link in [['/', 'Start'], ['#leistungen', 'Leistungen'], ['#about', 'Über uns'], ['#kontakt', 'Kontakt']]"
-              :key="link[0]" :href="link[0]"
+            <NuxtLink v-for="link in [['/', 'Start'], ['/leistungen', 'Leistungen'], ['/about', 'Über uns'], ['/kontakt', 'Kontakt']]"
+              :key="link[0]" :to="link[0]"
               style="font-size:13px;color:var(--nx-muted);text-decoration:none;transition:color .15s"
               onmouseover="this.style.color='var(--nx-text)'"
               onmouseout="this.style.color='var(--nx-muted)'">
               {{ link[1] }}
-            </a>
+            </NuxtLink>
             <NuxtLink v-for="pg in pages" :key="pg.slug" :to="`/${pg.slug}`"
               style="font-size:13px;color:var(--nx-muted);text-decoration:none;transition:color .15s"
               onmouseover="this.style.color='var(--nx-text)'"

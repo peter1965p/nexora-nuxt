@@ -1,9 +1,11 @@
 <script setup lang="ts">
 const { tenant } = useTenant()
-const menuOpen = ref(false)
-const accent   = computed(() => tenant.value.branding.primaryColor || '#f97316')
+const menuOpen   = ref(false)
+const accent     = computed(() => tenant.value.branding.primaryColor || '#f97316')
+const pages      = computed(() => tenant.value.pages || [])
 
-const pages = computed(() => tenant.value.pages || [])
+const route = useRoute()
+watch(() => route.fullPath, () => { menuOpen.value = false })
 </script>
 
 <template>
@@ -11,7 +13,7 @@ const pages = computed(() => tenant.value.pages || [])
     <div style="max-width:1200px;margin:0 auto;padding:0 24px;height:68px;display:flex;align-items:center;gap:32px">
 
       <!-- Logo -->
-      <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0">
+      <NuxtLink to="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0">
         <div v-if="tenant.branding.logoUrl">
           <img :src="tenant.branding.logoUrl" :alt="tenant.companyName" style="height:32px;width:auto;object-fit:contain" />
         </div>
@@ -24,38 +26,51 @@ const pages = computed(() => tenant.value.pages || [])
             {{ (tenant.companyName || 'nexora').toLowerCase() }}
           </span>
         </template>
-      </a>
+      </NuxtLink>
 
       <!-- Desktop Nav -->
       <nav style="flex:1;display:flex;align-items:center;gap:4px" class="desktop-nav">
-        <a href="/" style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+        <NuxtLink to="/"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">Start</a>
-        <a href="#leistungen" style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          Start
+        </NuxtLink>
+        <NuxtLink to="/leistungen"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">Leistungen</a>
-        <a href="#about" style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          Leistungen
+        </NuxtLink>
+        <NuxtLink to="/about"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">Über uns</a>
-        <a href="#kontakt" style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          Über uns
+        </NuxtLink>
+        <NuxtLink to="/kontakt"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">Kontakt</a>
-        <template v-for="pg in pages" :key="pg.slug">
-          <NuxtLink :to="`/${pg.slug}`" style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-            onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-            onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">{{ pg.title }}</NuxtLink>
-        </template>
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          Kontakt
+        </NuxtLink>
+        <NuxtLink v-for="pg in pages" :key="pg.slug" :to="`/${pg.slug}`"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          {{ pg.title }}
+        </NuxtLink>
       </nav>
 
       <!-- CTA -->
-      <a href="#kontakt"
+      <NuxtLink to="/kontakt"
         style="flex-shrink:0;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;color:#fff;text-decoration:none;transition:opacity .15s;white-space:nowrap"
         :style="{ background: accent }"
         onmouseover="this.style.opacity='.85'"
         onmouseout="this.style.opacity='1'"
         class="desktop-nav">
         Projekt starten →
-      </a>
+      </NuxtLink>
 
       <!-- Mobile burger -->
       <button @click="menuOpen = !menuOpen"
@@ -72,16 +87,20 @@ const pages = computed(() => tenant.value.pages || [])
     <!-- Mobile menu -->
     <div v-if="menuOpen"
       style="position:fixed;inset:0;top:68px;z-index:99;background:var(--nx-bg);border-top:1px solid var(--nx-border);padding:24px;display:flex;flex-direction:column;gap:4px;font-family:'Inter',system-ui,sans-serif">
-      <a v-for="link in [['/', 'Start'], ['#leistungen', 'Leistungen'], ['#about', 'Über uns'], ['#kontakt', 'Kontakt']]"
-        :key="link[0]" :href="link[0]" @click="menuOpen=false"
+      <NuxtLink v-for="link in [['/', 'Start'], ['/leistungen', 'Leistungen'], ['/about', 'Über uns'], ['/kontakt', 'Kontakt']]"
+        :key="link[0]" :to="link[0]"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
         {{ link[1] }}
-      </a>
-      <a href="#kontakt" @click="menuOpen=false"
+      </NuxtLink>
+      <NuxtLink v-for="pg in pages" :key="pg.slug" :to="`/${pg.slug}`"
+        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
+        {{ pg.title }}
+      </NuxtLink>
+      <NuxtLink to="/kontakt"
         style="display:block;margin-top:20px;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:600;color:#fff;text-decoration:none;text-align:center"
         :style="{ background: accent }">
         Projekt starten →
-      </a>
+      </NuxtLink>
     </div>
   </header>
 </template>

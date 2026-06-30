@@ -1,14 +1,14 @@
 <script setup lang="ts">
 const { tenant } = useTenant()
-const config = useRuntimeConfig()
+const config     = useRuntimeConfig()
 
-const accent     = computed(() => tenant.value.branding.primaryColor || '#f97316')
-const phoneHref  = computed(() => {
+const accent    = computed(() => tenant.value.branding.primaryColor || '#f97316')
+const phoneHref = computed(() => {
   const p = tenant.value.contact.phone
   return p ? `tel:${p.replace(/\s/g, '')}` : '#'
 })
 
-const form = reactive({ name: '', email: '', subject: '', message: '' })
+const form    = reactive({ name: '', email: '', subject: '', message: '' })
 const sending = ref(false)
 const sent    = ref(false)
 const error   = ref('')
@@ -25,12 +25,7 @@ async function submit() {
     const tenantId = tenant.value.tenantId
     await $fetch(`${apiUrl}/api/public/${tenantId}/contact`, {
       method: 'POST',
-      body: {
-        name:    form.name,
-        email:   form.email,
-        subject: form.subject,
-        message: form.message,
-      },
+      body: { name: form.name, email: form.email, subject: form.subject, message: form.message },
     })
     sent.value = true
     form.name = form.email = form.subject = form.message = ''
@@ -42,100 +37,170 @@ async function submit() {
 </script>
 
 <template>
-  <section class="w-full px-6 md:px-16 py-24 flex flex-col md:flex-row gap-16 max-w-6xl mx-auto">
+  <div style="font-family:'Inter',system-ui,sans-serif">
 
-    <!-- Left: contact info -->
-    <div class="md:w-80 flex-shrink-0">
-      <p class="text-[10px] uppercase tracking-[0.3em] mb-4" :style="{ color: accent }">Kontakt</p>
-      <h2 class="text-4xl font-black italic uppercase mb-8" style="color:var(--nx-text)">Jetzt anfragen.</h2>
-      <div class="space-y-5 text-[11px]" style="color:var(--nx-muted)">
-        <div v-if="tenant.contact.address" class="flex items-start gap-3">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="accent" stroke-width="2" class="mt-0.5 shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span style="white-space:pre-line">{{ tenant.contact.address }}</span>
+    <!-- Page header -->
+    <section style="position:relative;padding:100px 24px 60px;border-bottom:1px solid var(--nx-border);overflow:hidden">
+      <div style="position:absolute;inset:0;pointer-events:none;opacity:.04"
+        :style="`background-image:linear-gradient(${accent} 1px,transparent 1px),linear-gradient(90deg,${accent} 1px,transparent 1px);background-size:52px 52px`"></div>
+      <div style="max-width:1200px;margin:0 auto;position:relative;z-index:1">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:9999px;border:1px solid var(--nx-border);background:var(--nx-surface);margin-bottom:28px">
+          <i class="ti ti-mail" :style="{ color: accent, fontSize: '11px' }"></i>
+          <span style="font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--nx-muted)">Kontakt</span>
         </div>
-        <div v-if="tenant.contact.phone">
-          <a :href="phoneHref" class="flex items-center gap-3 hover:opacity-100 transition-opacity" style="opacity:.8;color:inherit">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="accent" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.8-1.8a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/></svg>
-            {{ tenant.contact.phone }}
+        <h1 style="font-size:clamp(2.4rem,5vw,3.8rem);font-weight:800;letter-spacing:-.03em;margin:0 0 18px;color:var(--nx-text);line-height:1.08">
+          Jetzt <span :style="{ color: accent }">anfragen.</span>
+        </h1>
+        <p style="font-size:17px;line-height:1.65;color:var(--nx-muted);margin:0;max-width:540px;font-weight:400">
+          Wir freuen uns auf Ihre Anfrage und melden uns schnellstmöglich.
+        </p>
+      </div>
+    </section>
+
+    <!-- Contact layout -->
+    <section style="max-width:1200px;margin:0 auto;padding:60px 24px 80px">
+      <div class="contact-grid">
+
+        <!-- Left: contact info -->
+        <div style="display:flex;flex-direction:column;gap:28px">
+          <h2 style="font-size:20px;font-weight:700;color:var(--nx-text);margin:0 0 4px;letter-spacing:-.01em">
+            Kontaktdaten
+          </h2>
+
+          <a v-if="tenant.contact.email" :href="`mailto:${tenant.contact.email}`"
+            style="display:flex;align-items:center;gap:14px;text-decoration:none;padding:18px;border:1px solid var(--nx-border);border-radius:10px;background:var(--nx-surface);transition:border-color .15s;color:var(--nx-text)"
+            onmouseover="this.style.borderColor='var(--nx-accent)'"
+            onmouseout="this.style.borderColor='var(--nx-border)'">
+            <div style="width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"
+              :style="{ background: accent + '18' }">
+              <i class="ti ti-mail" :style="{ color: accent }"></i>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:3px">E-Mail</div>
+              <div style="font-size:14px;font-weight:500">{{ tenant.contact.email }}</div>
+            </div>
           </a>
-        </div>
-        <div v-if="tenant.contact.email">
-          <a :href="`mailto:${tenant.contact.email}`" class="flex items-center gap-3 hover:opacity-100 transition-opacity" style="opacity:.8;color:inherit">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="accent" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
-            {{ tenant.contact.email }}
+
+          <a v-if="tenant.contact.phone" :href="phoneHref"
+            style="display:flex;align-items:center;gap:14px;text-decoration:none;padding:18px;border:1px solid var(--nx-border);border-radius:10px;background:var(--nx-surface);transition:border-color .15s;color:var(--nx-text)"
+            onmouseover="this.style.borderColor='var(--nx-accent)'"
+            onmouseout="this.style.borderColor='var(--nx-border)'">
+            <div style="width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"
+              :style="{ background: accent + '18' }">
+              <i class="ti ti-phone" :style="{ color: accent }"></i>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:3px">Telefon</div>
+              <div style="font-size:14px;font-weight:500">{{ tenant.contact.phone }}</div>
+            </div>
           </a>
+
+          <div v-if="tenant.contact.address"
+            style="display:flex;align-items:flex-start;gap:14px;padding:18px;border:1px solid var(--nx-border);border-radius:10px;background:var(--nx-surface)">
+            <div style="width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"
+              :style="{ background: accent + '18' }">
+              <i class="ti ti-map-pin" :style="{ color: accent }"></i>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:3px">Adresse</div>
+              <div style="font-size:14px;font-weight:500;color:var(--nx-text);white-space:pre-line;line-height:1.5">{{ tenant.contact.address }}</div>
+            </div>
+          </div>
+
+          <!-- Response time notice -->
+          <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border:1px solid var(--nx-border);border-radius:8px;background:var(--nx-surface)">
+            <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 2s infinite"></span>
+            <span style="font-size:12px;color:var(--nx-muted)">Wir antworten in der Regel innerhalb von 24h.</span>
+          </div>
         </div>
-        <div v-if="tenant.contact.availability" class="flex items-start gap-3">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" :stroke="accent" stroke-width="2" class="mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          {{ tenant.contact.availability }}
+
+        <!-- Right: form -->
+        <div>
+          <!-- Success -->
+          <div v-if="sent"
+            style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:60px 24px;text-align:center;border:1px solid var(--nx-border);border-radius:12px;background:var(--nx-surface)">
+            <div style="width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center"
+              :style="{ background: accent + '22' }">
+              <i class="ti ti-check" :style="{ color: accent, fontSize: '24px' }"></i>
+            </div>
+            <div>
+              <h3 style="font-size:20px;font-weight:700;color:var(--nx-text);margin:0 0 8px">Nachricht gesendet!</h3>
+              <p style="font-size:14px;color:var(--nx-muted);margin:0">Wir melden uns schnellstmöglich bei Ihnen.</p>
+            </div>
+            <button style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;background:none;border:none;cursor:pointer;text-decoration:underline;font-family:inherit"
+              :style="{ color: accent }"
+              @click="sent = false">
+              Weitere Anfrage senden
+            </button>
+          </div>
+
+          <!-- Form -->
+          <form v-else @submit.prevent="submit"
+            style="display:flex;flex-direction:column;gap:16px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="form-row">
+              <div>
+                <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:8px">Name *</label>
+                <input v-model="form.name" type="text" placeholder="Max Mustermann" required
+                  style="width:100%;padding:12px 14px;border:1px solid var(--nx-border);border-radius:8px;background:var(--nx-surface);color:var(--nx-text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;transition:border-color .15s"
+                  @focus="($event.target as HTMLInputElement).style.borderColor = accent"
+                  @blur="($event.target as HTMLInputElement).style.borderColor = 'var(--nx-border)'" />
+              </div>
+              <div>
+                <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:8px">E-Mail *</label>
+                <input v-model="form.email" type="email" placeholder="max@firma.de" required
+                  style="width:100%;padding:12px 14px;border:1px solid var(--nx-border);border-radius:8px;background:var(--nx-surface);color:var(--nx-text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;transition:border-color .15s"
+                  @focus="($event.target as HTMLInputElement).style.borderColor = accent"
+                  @blur="($event.target as HTMLInputElement).style.borderColor = 'var(--nx-border)'" />
+              </div>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:8px">Betreff</label>
+              <input v-model="form.subject" type="text" placeholder="Worum geht es?"
+                style="width:100%;padding:12px 14px;border:1px solid var(--nx-border);border-radius:8px;background:var(--nx-surface);color:var(--nx-text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;transition:border-color .15s"
+                @focus="($event.target as HTMLInputElement).style.borderColor = accent"
+                @blur="($event.target as HTMLInputElement).style.borderColor = 'var(--nx-border)'" />
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:8px">Nachricht *</label>
+              <textarea v-model="form.message" rows="6" placeholder="Schildern Sie uns Ihr Anliegen…" required
+                style="width:100%;padding:12px 14px;border:1px solid var(--nx-border);border-radius:8px;background:var(--nx-surface);color:var(--nx-text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:vertical;line-height:1.6;transition:border-color .15s"
+                @focus="($event.target as HTMLTextAreaElement).style.borderColor = accent"
+                @blur="($event.target as HTMLTextAreaElement).style.borderColor = 'var(--nx-border)'">
+              </textarea>
+            </div>
+            <div v-if="error"
+              style="font-size:13px;padding:12px 16px;border-radius:8px;color:#f87171;background:#f8717111;border:1px solid #f8717133">
+              {{ error }}
+            </div>
+            <div style="display:flex;align-items:center;gap:16px">
+              <button type="submit" :disabled="sending"
+                style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;color:#fff;border:none;cursor:pointer;transition:opacity .15s;font-family:inherit"
+                :style="{ background: accent, opacity: sending ? '.5' : '1' }">
+                <span v-if="sending">Wird gesendet…</span>
+                <span v-else>Anfrage senden →</span>
+              </button>
+              <p style="font-size:12px;color:var(--nx-muted);margin:0">Ihre Anfrage wird als Lead im CRM gespeichert.</p>
+            </div>
+          </form>
         </div>
       </div>
-    </div>
-
-    <!-- Right: form -->
-    <div class="flex-1">
-      <!-- Success -->
-      <div v-if="sent" class="flex flex-col items-center justify-center gap-4 py-16 text-center">
-        <div class="w-14 h-14 rounded-full flex items-center justify-center" :style="{ background: accent + '22' }">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" :stroke="accent" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <h3 class="text-xl font-black italic uppercase" style="color:var(--nx-text)">Nachricht gesendet.</h3>
-        <p class="text-[11px]" style="color:var(--nx-muted)">Wir melden uns schnellstmöglich bei Ihnen.</p>
-        <button class="text-[10px] uppercase tracking-widest mt-4 underline" :style="{ color: accent }" @click="sent = false">
-          Weitere Anfrage
-        </button>
-      </div>
-
-      <!-- Form -->
-      <form v-else @submit.prevent="submit" class="flex flex-col gap-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-[9px] uppercase tracking-widest mb-2" style="color:var(--nx-muted)">Name *</label>
-            <input v-model="form.name" type="text" placeholder="Max Mustermann" required
-              class="w-full px-4 py-3 text-[12px] outline-none transition-all"
-              style="background:var(--nx-surface);border:1px solid var(--nx-border);color:var(--nx-text);font-family:inherit;border-radius:4px"
-              @focus="($event.target as HTMLInputElement).style.borderColor = accent"
-              @blur="($event.target as HTMLInputElement).style.borderColor = 'var(--nx-border)'" />
-          </div>
-          <div>
-            <label class="block text-[9px] uppercase tracking-widest mb-2" style="color:var(--nx-muted)">E-Mail *</label>
-            <input v-model="form.email" type="email" placeholder="max@firma.de" required
-              class="w-full px-4 py-3 text-[12px] outline-none transition-all"
-              style="background:var(--nx-surface);border:1px solid var(--nx-border);color:var(--nx-text);font-family:inherit;border-radius:4px"
-              @focus="($event.target as HTMLInputElement).style.borderColor = accent"
-              @blur="($event.target as HTMLInputElement).style.borderColor = 'var(--nx-border)'" />
-          </div>
-        </div>
-        <div>
-          <label class="block text-[9px] uppercase tracking-widest mb-2" style="color:var(--nx-muted)">Betreff</label>
-          <input v-model="form.subject" type="text" placeholder="Worum geht es?"
-            class="w-full px-4 py-3 text-[12px] outline-none transition-all"
-            style="background:var(--nx-surface);border:1px solid var(--nx-border);color:var(--nx-text);font-family:inherit;border-radius:4px"
-            @focus="($event.target as HTMLInputElement).style.borderColor = accent"
-            @blur="($event.target as HTMLInputElement).style.borderColor = 'var(--nx-border)'" />
-        </div>
-        <div>
-          <label class="block text-[9px] uppercase tracking-widest mb-2" style="color:var(--nx-muted)">Nachricht *</label>
-          <textarea v-model="form.message" rows="6" placeholder="Schildern Sie uns Ihr Anliegen..." required
-            class="w-full px-4 py-3 text-[12px] outline-none transition-all resize-y"
-            style="background:var(--nx-surface);border:1px solid var(--nx-border);color:var(--nx-text);font-family:inherit;border-radius:4px;line-height:1.6"
-            @focus="($event.target as HTMLTextAreaElement).style.borderColor = accent"
-            @blur="($event.target as HTMLTextAreaElement).style.borderColor = 'var(--nx-border)'">
-          </textarea>
-        </div>
-        <div v-if="error" class="text-[11px] px-3 py-2 rounded" style="color:#f87171;background:#f8717111;border:1px solid #f8717133">
-          {{ error }}
-        </div>
-        <div class="flex items-center gap-4">
-          <button type="submit" :disabled="sending"
-            class="px-8 py-3 text-[11px] font-bold uppercase tracking-widest text-white transition-opacity disabled:opacity-50"
-            style="background:var(--nx-accent);border:none;cursor:pointer;border-radius:4px;font-family:inherit">
-            <span v-if="sending">Wird gesendet…</span>
-            <span v-else>Anfrage senden →</span>
-          </button>
-          <p class="text-[9px]" style="color:var(--nx-muted)">Wird als Lead in Plexora CRM gespeichert.</p>
-        </div>
-      </form>
-    </div>
-  </section>
+    </section>
+  </div>
 </template>
+
+<style scoped>
+.contact-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 60px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .contact-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+  .form-row     { grid-template-columns: 1fr !important; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .4; }
+}
+</style>

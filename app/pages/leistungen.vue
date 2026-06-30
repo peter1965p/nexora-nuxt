@@ -1,12 +1,12 @@
 <script setup lang="ts">
 const { tenant } = useTenant()
-useHead({ title: computed(() => `Leistungen · ${tenant.value.companyName}`) })
+useHead({ title: computed(() => `Leistungen · ${tenant.value.companyName || 'Nexora'}`) })
 </script>
 
 <template>
-  <div style="background:var(--nx-bg);color:var(--nx-text);min-height:100vh;font-family:ui-monospace,SFMono-Regular,'SF Mono',Consolas,monospace">
+  <div style="background:var(--nx-bg);color:var(--nx-text);min-height:100vh;font-family:'Inter',system-ui,sans-serif">
     <NexoraNavbar />
-    <main class="pt-20">
+    <main>
       <NexoraServices />
     </main>
     <NexoraFooter />

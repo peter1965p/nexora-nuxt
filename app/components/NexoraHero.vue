@@ -78,20 +78,20 @@ const codeProvider = computed(() => {
 
         <!-- CTAs -->
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-          <a href="#kontakt"
+          <NuxtLink to="/kontakt"
             style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;color:#fff;text-decoration:none;transition:all .2s"
             :style="{ background: accent }"
             onmouseover="this.style.opacity='.85';this.style.transform='translateY(-1px)'"
             onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
             {{ (hero as any).cta || 'Kontakt aufnehmen' }} →
-          </a>
-          <a href="#leistungen"
-            style="display:inline-flex;align-items:center;gap:6px;padding:12px 4px;font-size:14px;font-weight:500;text-decoration:none;transition:opacity .15s"
+          </NuxtLink>
+          <NuxtLink to="/leistungen"
+            style="display:inline-flex;align-items:center;gap:6px;padding:12px 4px;font-size:14px;font-weight:500;text-decoration:none;transition:color .15s"
             :style="{ color: 'var(--nx-muted)' }"
             onmouseover="this.style.color='var(--nx-text)'"
             onmouseout="this.style.color='var(--nx-muted)'">
             Leistungen ansehen
-          </a>
+          </NuxtLink>
         </div>
       </div>
 
