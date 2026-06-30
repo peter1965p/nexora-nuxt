@@ -60,14 +60,9 @@ const codeProvider = computed(() => {
           <!-- Headline (white) -->
           <span style="color:var(--nx-text);display:block">{{ parsed.headline }}</span>
 
-          <!-- Subheadline: first word = oval + accent, rest = gradient -->
+          <!-- Subheadline: first word = accent, rest = gradient -->
           <span style="display:block">
-            <span v-if="parsed.oval" style="position:relative;display:inline-block" :style="{ color: accent }">
-              {{ parsed.oval }}
-              <svg style="position:absolute;left:-10%;top:-10%;width:120%;height:130%;pointer-events:none" viewBox="0 0 120 50" preserveAspectRatio="none">
-                <ellipse cx="60" cy="25" rx="57" ry="22" fill="none" stroke="#ef4444" stroke-width="1.8" transform="rotate(-3 60 25)" opacity=".85"/>
-              </svg>
-            </span>
+            <span v-if="parsed.oval" :style="{ color: accent }">{{ parsed.oval }}</span>
             <span v-if="parsed.rest"
               :style="`background:linear-gradient(135deg,${accent},${accent}99);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text`">
               {{ ' ' + parsed.rest }}
@@ -75,10 +70,11 @@ const codeProvider = computed(() => {
           </span>
         </h1>
 
-        <!-- Subline -->
-        <p style="font-size:17px;line-height:1.65;color:var(--nx-muted);margin:0 0 36px;max-width:460px;font-weight:400">
-          {{ (hero as any).subheadline || (hero as any).desc || 'Digitale Lösungen für Unternehmen, die wachsen wollen.' }}
+        <!-- Desc only (subheadline is used in the headline above) -->
+        <p v-if="(hero as any).desc" style="font-size:17px;line-height:1.65;color:var(--nx-muted);margin:0 0 36px;max-width:460px;font-weight:400">
+          {{ (hero as any).desc }}
         </p>
+        <div v-else style="margin-bottom:36px"></div>
 
         <!-- CTAs -->
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
