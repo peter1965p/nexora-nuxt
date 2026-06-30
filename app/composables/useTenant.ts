@@ -68,6 +68,24 @@ export interface NexoraClientsConfig {
   title?: string
 }
 
+export interface NexoraGithubRepo {
+  name: string
+  description: string
+  url: string
+  homepage: string
+  language: string
+  stars: number
+  forks: number
+  topics: string[]
+  updatedAt: string
+}
+
+export interface NexoraGithubConfig {
+  enabled: boolean
+  title?: string
+  repos: NexoraGithubRepo[]
+}
+
 export interface TenantData {
   tenantId: string
   companyName: string
@@ -79,6 +97,7 @@ export interface TenantData {
   theme: string
   stack: NexoraStackConfig
   clients: NexoraClientsConfig
+  github: NexoraGithubConfig
 }
 
 const THEMES: Record<string, Record<string, string>> = {
@@ -140,6 +159,7 @@ const DEFAULT: TenantData = {
   theme: 'midnight',
   stack:   { enabled: false, items: [], title: 'TECH STACK', legend: {} },
   clients: { enabled: false, items: [], title: 'REFERENZEN' },
+  github:  { enabled: false, repos: [], title: 'PROJEKTE' },
 }
 
 export const useTenant = () => {
@@ -172,7 +192,7 @@ export const useTenant = () => {
     if (!tenantId) { resolved.value = true; return }
 
     try {
-      const [branding, content, services, contact, pagesRes, stackRes, clientsRes] = await Promise.allSettled([
+      const [branding, content, services, contact, pagesRes, stackRes, clientsRes, githubRes] = await Promise.allSettled([
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/branding`),
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/content`),
         $fetch<any>(`${apiUrl}/api/public/${tenantId}/services`),
@@ -180,6 +200,7 @@ export const useTenant = () => {
         $fetch<{ pages: NexoraPage[]; theme: string }>(`${apiUrl}/api/public/${tenantId}/pages`),
         $fetch<NexoraStackConfig>(`${apiUrl}/api/public/${tenantId}/stack`),
         $fetch<NexoraClientsConfig>(`${apiUrl}/api/public/${tenantId}/clients`),
+        $fetch<NexoraGithubConfig>(`${apiUrl}/api/public/${tenantId}/github`),
       ])
 
       const b  = branding.status  === 'fulfilled' ? branding.value  : {}
@@ -189,6 +210,7 @@ export const useTenant = () => {
       const pg = pagesRes.status  === 'fulfilled' ? pagesRes.value  : { pages: [], theme: 'midnight' }
       const st = stackRes.status   === 'fulfilled' ? stackRes.value   : null
       const cl = clientsRes.status === 'fulfilled' ? clientsRes.value : null
+      const gh = githubRes.status  === 'fulfilled' ? githubRes.value  : null
 
       const theme = pg.theme || 'midnight'
 
@@ -222,6 +244,11 @@ export const useTenant = () => {
           enabled: cl?.enabled ?? false,
           items:   cl?.items   || [],
           title:   cl?.title   || 'REFERENZEN',
+        },
+        github: {
+          enabled: gh?.enabled ?? false,
+          repos:   gh?.repos   || [],
+          title:   gh?.title   || 'PROJEKTE',
         },
       }
 

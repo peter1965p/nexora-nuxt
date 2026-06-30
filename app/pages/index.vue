@@ -8,6 +8,7 @@
       <NexoraHero />
       <NexoraStack />
       <NexoraClients />
+      <NexoraGitHub />
     </main>
     <NexoraFooter />
   </div>
