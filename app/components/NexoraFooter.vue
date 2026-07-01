@@ -4,6 +4,7 @@ const accent  = computed(() => tenant.value.branding.primaryColor || '#f97316')
 const company = computed(() => tenant.value.companyName || 'nexora')
 const contact = computed(() => tenant.value.contact || {})
 const pages   = computed(() => tenant.value.pages || [])
+const footer  = computed(() => tenant.value.content.footer || {})
 </script>
 
 <template>
@@ -79,12 +80,18 @@ const pages   = computed(() => tenant.value.pages || [])
 
       <!-- Bottom bar -->
       <div style="padding-top:24px;border-top:1px solid var(--nx-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-        <span style="font-size:12px;color:var(--nx-muted)">
-          © {{ new Date().getFullYear() }} {{ company }} — Alle Rechte vorbehalten
-        </span>
-        <div v-if="tenant.content.footer?.showStatus !== false" style="display:flex;align-items:center;gap:6px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span style="font-size:12px;color:var(--nx-muted)">
+            {{ footer.copyrightText || `© ${new Date().getFullYear()} ${company} — Alle Rechte vorbehalten` }}
+          </span>
+          <span v-if="footer.creditText" style="font-size:11px;color:var(--nx-muted);display:flex;align-items:center;gap:5px">
+            <i v-if="footer.creditIcon" :class="['ti', footer.creditIcon]" style="font-size:12px" :style="{ color: accent }"></i>
+            {{ footer.creditText }}
+          </span>
+        </div>
+        <div v-if="footer.showStatus !== false" style="display:flex;align-items:center;gap:6px">
           <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e88;animation:pulse 2s infinite"></span>
-          <span style="font-size:11px;font-weight:500;color:var(--nx-muted)">{{ tenant.content.footer?.statusLabel || 'System Online' }}</span>
+          <span style="font-size:11px;font-weight:500;color:var(--nx-muted)">{{ footer.statusLabel || 'System Online' }}</span>
         </div>
       </div>
     </div>

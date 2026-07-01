@@ -16,6 +16,9 @@ export interface NexoraFooter {
   tagline?: string
   statusLabel?: string
   showStatus?: boolean
+  copyrightText?: string
+  creditText?: string
+  creditIcon?: string
 }
 
 export interface NexoraContent {
@@ -95,6 +98,32 @@ export interface NexoraLayout {
   sectionOrder: string[]
 }
 
+export interface NexoraBlogPost {
+  postId: string
+  title: string
+  slug: string
+  excerpt: string
+  coverImageUrl?: string
+  tags?: string[]
+  publishedAt?: string
+  contentType: string
+}
+
+export interface NexoraBlogConfig {
+  enabled: boolean
+  title?: string
+}
+
+export interface NexoraShopConfig {
+  enabled: boolean
+  title?: string
+}
+
+export interface NexoraVehiclesConfig {
+  enabled: boolean
+  title?: string
+}
+
 export interface TenantData {
   tenantId: string
   companyName: string
@@ -107,6 +136,9 @@ export interface TenantData {
   stack: NexoraStackConfig
   clients: NexoraClientsConfig
   github: NexoraGithubConfig
+  blog: NexoraBlogConfig
+  shop: NexoraShopConfig
+  vehicles: NexoraVehiclesConfig
   sectionOrder: string[]
 }
 
@@ -170,6 +202,9 @@ const DEFAULT: TenantData = {
   stack:        { enabled: false, items: [], title: 'TECH STACK', legend: {} },
   clients:      { enabled: false, items: [], title: 'REFERENZEN' },
   github:       { enabled: false, repos: [], title: 'PROJEKTE' },
+  blog:         { enabled: false, title: 'Blog' },
+  shop:         { enabled: false, title: 'Shop' },
+  vehicles:     { enabled: false, title: 'Fahrzeuge' },
   sectionOrder: ['stack', 'clients', 'github', 'services', 'contact'],
 }
 
@@ -230,7 +265,7 @@ export const useTenant = () => {
       tenant.value = {
         tenantId,
         companyName: b.companyName || DEFAULT.companyName,
-        branding: { ...DEFAULT.branding, ...b, heroMediaType: b.heroMediaType || 'code', heroImageUrl: b.heroImageUrl || '' },
+        branding: { ...DEFAULT.branding, ...b, primaryColor: b.config?.primaryColor || b.primaryColor || DEFAULT.branding.primaryColor, heroMediaType: b.heroMediaType || 'code', heroImageUrl: b.heroImageUrl || '' },
         content: {
           hero: {
             headline:    c.hero?.headline    || DEFAULT.content.hero?.headline,
@@ -263,10 +298,22 @@ export const useTenant = () => {
           repos:   gh?.repos   || [],
           title:   gh?.title   || 'PROJEKTE',
         },
+        blog: {
+          enabled: b.blogEnabled ?? false,
+          title:   b.blogTitle   || 'Blog',
+        },
+        shop: {
+          enabled: b.shopEnabled ?? false,
+          title:   b.shopTitle   || 'Shop',
+        },
+        vehicles: {
+          enabled: b.vehiclesEnabled ?? false,
+          title:   b.vehiclesTitle   || 'Fahrzeuge',
+        },
         sectionOrder: lo?.sectionOrder || ['stack', 'clients', 'github', 'services', 'contact'],
       }
 
-      applyTheme(theme, b.primaryColor)
+      applyTheme(theme, b.config?.primaryColor || b.primaryColor)
     } catch {}
 
     resolved.value = true

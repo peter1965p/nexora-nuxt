@@ -3,6 +3,12 @@ const { tenant } = useTenant()
 const menuOpen   = ref(false)
 const accent     = computed(() => tenant.value.branding.primaryColor || '#f97316')
 const pages      = computed(() => tenant.value.pages || [])
+const blogEnabled = computed(() => tenant.value.blog?.enabled ?? false)
+const blogTitle   = computed(() => tenant.value.blog?.title || 'Blog')
+const shopEnabled = computed(() => tenant.value.shop?.enabled ?? false)
+const shopTitle   = computed(() => tenant.value.shop?.title || 'Shop')
+const vehiclesEnabled = computed(() => tenant.value.vehicles?.enabled ?? false)
+const vehiclesTitle   = computed(() => tenant.value.vehicles?.title || 'Fahrzeuge')
 
 const route = useRoute()
 watch(() => route.fullPath, () => { menuOpen.value = false })
@@ -54,6 +60,24 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
           onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
           Kontakt
         </NuxtLink>
+        <NuxtLink v-if="shopEnabled" to="/shop"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          {{ shopTitle }}
+        </NuxtLink>
+        <NuxtLink v-if="blogEnabled" to="/blog"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          {{ blogTitle }}
+        </NuxtLink>
+        <NuxtLink v-if="vehiclesEnabled" to="/fahrzeuge"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          {{ vehiclesTitle }}
+        </NuxtLink>
         <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
           style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
@@ -91,6 +115,18 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
         :key="link[0]" :to="link[0]"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
         {{ link[1] }}
+      </NuxtLink>
+      <NuxtLink v-if="shopEnabled" to="/shop"
+        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
+        {{ shopTitle }}
+      </NuxtLink>
+      <NuxtLink v-if="blogEnabled" to="/blog"
+        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
+        {{ blogTitle }}
+      </NuxtLink>
+      <NuxtLink v-if="vehiclesEnabled" to="/fahrzeuge"
+        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
+        {{ vehiclesTitle }}
       </NuxtLink>
       <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
