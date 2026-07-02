@@ -9,6 +9,8 @@ const shopEnabled = computed(() => tenant.value.shop?.enabled ?? false)
 const shopTitle   = computed(() => tenant.value.shop?.title || 'Shop')
 const vehiclesEnabled = computed(() => tenant.value.vehicles?.enabled ?? false)
 const vehiclesTitle   = computed(() => tenant.value.vehicles?.title || 'Fahrzeuge')
+const foodMenuEnabled = computed(() => tenant.value.menu?.enabled ?? false)
+const foodMenuTitle   = computed(() => tenant.value.menu?.title || 'Speisekarte')
 
 const route = useRoute()
 watch(() => route.fullPath, () => { menuOpen.value = false })
@@ -78,6 +80,12 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
           onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
           {{ vehiclesTitle }}
         </NuxtLink>
+        <NuxtLink v-if="foodMenuEnabled" to="/speisekarte"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          {{ foodMenuTitle }}
+        </NuxtLink>
         <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
           style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
@@ -127,6 +135,10 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
       <NuxtLink v-if="vehiclesEnabled" to="/fahrzeuge"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
         {{ vehiclesTitle }}
+      </NuxtLink>
+      <NuxtLink v-if="foodMenuEnabled" to="/speisekarte"
+        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
+        {{ foodMenuTitle }}
       </NuxtLink>
       <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">

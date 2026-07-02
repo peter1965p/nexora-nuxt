@@ -124,6 +124,11 @@ export interface NexoraVehiclesConfig {
   title?: string
 }
 
+export interface NexoraMenuConfig {
+  enabled: boolean
+  title?: string
+}
+
 export interface TenantData {
   tenantId: string
   companyName: string
@@ -139,6 +144,7 @@ export interface TenantData {
   blog: NexoraBlogConfig
   shop: NexoraShopConfig
   vehicles: NexoraVehiclesConfig
+  menu: NexoraMenuConfig
   sectionOrder: string[]
 }
 
@@ -205,6 +211,7 @@ const DEFAULT: TenantData = {
   blog:         { enabled: false, title: 'Blog' },
   shop:         { enabled: false, title: 'Shop' },
   vehicles:     { enabled: false, title: 'Fahrzeuge' },
+  menu:         { enabled: false, title: 'Speisekarte' },
   sectionOrder: ['stack', 'clients', 'github', 'services', 'contact'],
 }
 
@@ -309,6 +316,10 @@ export const useTenant = () => {
         vehicles: {
           enabled: b.vehiclesEnabled ?? false,
           title:   b.vehiclesTitle   || 'Fahrzeuge',
+        },
+        menu: {
+          enabled: b.menuEnabled ?? false,
+          title:   b.menuTitle   || 'Speisekarte',
         },
         sectionOrder: lo?.sectionOrder || ['stack', 'clients', 'github', 'services', 'contact'],
       }
