@@ -127,6 +127,7 @@ export interface NexoraVehiclesConfig {
 export interface NexoraMenuConfig {
   enabled: boolean
   title?: string
+  orderingEnabled?: boolean
 }
 
 export interface TenantData {
@@ -320,6 +321,7 @@ export const useTenant = () => {
         menu: {
           enabled: b.menuEnabled ?? false,
           title:   b.menuTitle   || 'Speisekarte',
+          orderingEnabled: b.orderingEnabled ?? false,
         },
         sectionOrder: lo?.sectionOrder || ['stack', 'clients', 'github', 'services', 'contact'],
       }
