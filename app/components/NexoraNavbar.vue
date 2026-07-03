@@ -13,6 +13,8 @@ const foodMenuEnabled = computed(() => tenant.value.menu?.enabled ?? false)
 const foodMenuTitle   = computed(() => tenant.value.menu?.title || 'Speisekarte')
 const propertiesEnabled = computed(() => tenant.value.properties?.enabled ?? false)
 const propertiesTitle   = computed(() => tenant.value.properties?.title || 'Immobilien')
+const termineEnabled = computed(() => tenant.value.termine?.enabled ?? false)
+const termineTitle   = computed(() => tenant.value.termine?.title || 'Termine')
 
 const route = useRoute()
 watch(() => route.fullPath, () => { menuOpen.value = false })
@@ -94,6 +96,12 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
           onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
           {{ propertiesTitle }}
         </NuxtLink>
+        <NuxtLink v-if="termineEnabled" to="/termine"
+          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
+          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
+          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
+          {{ termineTitle }}
+        </NuxtLink>
         <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
           style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
@@ -151,6 +159,10 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
       <NuxtLink v-if="propertiesEnabled" to="/immobilien"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
         {{ propertiesTitle }}
+      </NuxtLink>
+      <NuxtLink v-if="termineEnabled" to="/termine"
+        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
+        {{ termineTitle }}
       </NuxtLink>
       <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
