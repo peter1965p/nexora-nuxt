@@ -159,6 +159,7 @@ export interface TenantData {
   properties: NexoraPropertiesConfig
   termine: NexoraTermineConfig
   sectionOrder: string[]
+  navOrder: string[]
 }
 
 const THEMES: Record<string, Record<string, string>> = {
@@ -228,6 +229,7 @@ const DEFAULT: TenantData = {
   properties:   { enabled: false, title: 'Immobilien' },
   termine:      { enabled: false, title: 'Termine' },
   sectionOrder: ['stack', 'clients', 'github', 'services', 'contact'],
+  navOrder:     ['start', 'leistungen', 'about', 'kontakt', 'shop', 'blog', 'vehicles', 'menu', 'properties', 'termine'],
 }
 
 export const useTenant = () => {
@@ -346,6 +348,7 @@ export const useTenant = () => {
           title:   b.termineTitle   || 'Termine',
         },
         sectionOrder: lo?.sectionOrder || ['stack', 'clients', 'github', 'services', 'contact'],
+        navOrder: b.navOrder || ['start', 'leistungen', 'about', 'kontakt', 'shop', 'blog', 'vehicles', 'menu', 'properties', 'termine'],
       }
 
       applyTheme(theme, b.config?.primaryColor || b.primaryColor)

@@ -16,6 +16,27 @@ const propertiesTitle   = computed(() => tenant.value.properties?.title || 'Immo
 const termineEnabled = computed(() => tenant.value.termine?.enabled ?? false)
 const termineTitle   = computed(() => tenant.value.termine?.title || 'Termine')
 
+const DEFAULT_NAV_ORDER = ['start', 'leistungen', 'about', 'kontakt', 'shop', 'blog', 'vehicles', 'menu', 'properties', 'termine']
+
+const navItems = computed(() => {
+  const all: Record<string, { to: string; label: string; enabled: boolean }> = {
+    start:      { to: '/',            label: 'Start',                enabled: true },
+    leistungen: { to: '/leistungen',  label: 'Leistungen',           enabled: true },
+    about:      { to: '/about',       label: 'Über uns',             enabled: true },
+    kontakt:    { to: '/kontakt',     label: 'Kontakt',               enabled: true },
+    shop:       { to: '/shop',        label: shopTitle.value,        enabled: shopEnabled.value },
+    blog:       { to: '/blog',        label: blogTitle.value,        enabled: blogEnabled.value },
+    vehicles:   { to: '/fahrzeuge',   label: vehiclesTitle.value,    enabled: vehiclesEnabled.value },
+    menu:       { to: '/speisekarte', label: foodMenuTitle.value,    enabled: foodMenuEnabled.value },
+    properties: { to: '/immobilien',  label: propertiesTitle.value,  enabled: propertiesEnabled.value },
+    termine:    { to: '/termine',     label: termineTitle.value,     enabled: termineEnabled.value },
+  }
+  const order = tenant.value.navOrder?.length ? tenant.value.navOrder : DEFAULT_NAV_ORDER
+  return order.filter(key => all[key]?.enabled).map(key => ({ key, ...all[key] }))
+})
+
+const customPages = computed(() => pages.value.filter(p => !['agb', 'datenschutz', 'impressum'].includes(p.slug)))
+
 const route = useRoute()
 watch(() => route.fullPath, () => { menuOpen.value = false })
 </script>
@@ -42,67 +63,13 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
 
       <!-- Desktop Nav -->
       <nav style="flex:1;display:flex;align-items:center;gap:4px" class="desktop-nav">
-        <NuxtLink to="/"
+        <NuxtLink v-for="item in navItems" :key="item.key" :to="item.to"
           style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
           onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          Start
+          {{ item.label }}
         </NuxtLink>
-        <NuxtLink to="/leistungen"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          Leistungen
-        </NuxtLink>
-        <NuxtLink to="/about"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          Über uns
-        </NuxtLink>
-        <NuxtLink to="/kontakt"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          Kontakt
-        </NuxtLink>
-        <NuxtLink v-if="shopEnabled" to="/shop"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          {{ shopTitle }}
-        </NuxtLink>
-        <NuxtLink v-if="blogEnabled" to="/blog"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          {{ blogTitle }}
-        </NuxtLink>
-        <NuxtLink v-if="vehiclesEnabled" to="/fahrzeuge"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          {{ vehiclesTitle }}
-        </NuxtLink>
-        <NuxtLink v-if="foodMenuEnabled" to="/speisekarte"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          {{ foodMenuTitle }}
-        </NuxtLink>
-        <NuxtLink v-if="propertiesEnabled" to="/immobilien"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          {{ propertiesTitle }}
-        </NuxtLink>
-        <NuxtLink v-if="termineEnabled" to="/termine"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          {{ termineTitle }}
-        </NuxtLink>
-        <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
+        <NuxtLink v-for="pg in customPages" :key="pg.slug" :to="`/${pg.slug}`"
           style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
           onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
           onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
@@ -135,36 +102,11 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
     <!-- Mobile menu -->
     <div v-if="menuOpen"
       style="position:fixed;inset:0;top:68px;z-index:99;background:var(--nx-bg);border-top:1px solid var(--nx-border);padding:24px;display:flex;flex-direction:column;gap:4px;font-family:'Inter',system-ui,sans-serif">
-      <NuxtLink v-for="link in [['/', 'Start'], ['/leistungen', 'Leistungen'], ['/about', 'Über uns'], ['/kontakt', 'Kontakt']]"
-        :key="link[0]" :to="link[0]"
+      <NuxtLink v-for="item in navItems" :key="item.key" :to="item.to"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
-        {{ link[1] }}
+        {{ item.label }}
       </NuxtLink>
-      <NuxtLink v-if="shopEnabled" to="/shop"
-        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
-        {{ shopTitle }}
-      </NuxtLink>
-      <NuxtLink v-if="blogEnabled" to="/blog"
-        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
-        {{ blogTitle }}
-      </NuxtLink>
-      <NuxtLink v-if="vehiclesEnabled" to="/fahrzeuge"
-        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
-        {{ vehiclesTitle }}
-      </NuxtLink>
-      <NuxtLink v-if="foodMenuEnabled" to="/speisekarte"
-        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
-        {{ foodMenuTitle }}
-      </NuxtLink>
-      <NuxtLink v-if="propertiesEnabled" to="/immobilien"
-        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
-        {{ propertiesTitle }}
-      </NuxtLink>
-      <NuxtLink v-if="termineEnabled" to="/termine"
-        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
-        {{ termineTitle }}
-      </NuxtLink>
-      <NuxtLink v-for="pg in pages.filter(p => !['agb','datenschutz','impressum'].includes(p.slug))" :key="pg.slug" :to="`/${pg.slug}`"
+      <NuxtLink v-for="pg in customPages" :key="pg.slug" :to="`/${pg.slug}`"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
         {{ pg.title }}
       </NuxtLink>
