@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { tenant } = useTenant()
 const config     = useRuntimeConfig()
+const { add: addToCart, count: cartCount } = useCart()
 
 interface ShopProduct {
   productId: string
@@ -34,6 +35,13 @@ useHead({ title: computed(() => `${shopTitle.value} · ${tenant.value.companyNam
 function formatPrice(price: number, currency: string) {
   return new Intl.NumberFormat('de-DE', { style: 'currency', currency: currency || 'EUR' }).format(price)
 }
+
+const addedId = ref('')
+function handleAdd(p: ShopProduct) {
+  addToCart({ productId: p.productId, name: p.name, price: p.price, imageUrl: p.imageUrl })
+  addedId.value = p.productId
+  setTimeout(() => { if (addedId.value === p.productId) addedId.value = '' }, 1200)
+}
 </script>
 
 <template>
@@ -42,11 +50,18 @@ function formatPrice(price: number, currency: string) {
 
     <div style="max-width:1200px;margin:0 auto;padding:100px 24px 80px">
       <!-- Header -->
-      <div style="margin-bottom:48px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:12px">{{ shopTitle }}</div>
-        <h1 style="font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:0">
-          Produkte & Angebote
-        </h1>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:48px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:12px">{{ shopTitle }}</div>
+          <h1 style="font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:0">
+            Produkte & Angebote
+          </h1>
+        </div>
+        <NuxtLink to="/shop/cart"
+          style="display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:8px;border:1px solid var(--nx-border);background:var(--nx-surface);color:var(--nx-text);text-decoration:none;font-size:13px;font-weight:600">
+          <i class="ti ti-shopping-cart"></i> Warenkorb
+          <span v-if="cartCount" style="background:var(--nx-accent);color:#fff;border-radius:999px;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;padding:0 5px" :style="{ background: accent }">{{ cartCount }}</span>
+        </NuxtLink>
       </div>
 
       <!-- Loading -->
@@ -82,13 +97,14 @@ function formatPrice(price: number, currency: string) {
               <span style="font-size:20px;font-weight:800;letter-spacing:-.02em" :style="{ color: accent }">
                 {{ formatPrice(p.price, p.currency) }}
               </span>
-              <a href="/kontakt"
-                style="padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600;color:#fff;text-decoration:none;transition:opacity .15s"
+              <button v-if="p.available" @click="handleAdd(p)"
+                style="padding:8px 16px;border-radius:8px;border:none;font-size:12px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .15s"
                 :style="{ background: accent }"
                 onmouseover="this.style.opacity='.85'"
                 onmouseout="this.style.opacity='1'">
-                Anfragen →
-              </a>
+                {{ addedId === p.productId ? 'Hinzugefügt ✓' : 'In den Warenkorb' }}
+              </button>
+              <span v-else style="font-size:12px;color:var(--nx-muted)">Nicht verfügbar</span>
             </div>
           </div>
         </div>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 const { resolve, tenant } = useTenant()
+const { load: loadCart }  = useCart()
 
 onMounted(async () => {
   await resolve()
+  loadCart()
 })
 
 useHead({
