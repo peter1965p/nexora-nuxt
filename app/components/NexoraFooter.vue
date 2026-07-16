@@ -74,8 +74,8 @@ const footer  = computed(() => tenant.value.content.footer || {})
               <i class="ti ti-map-pin" style="font-size:13px;flex-shrink:0;margin-top:2px"></i>{{ contact.address }}
             </span>
           </div>
-          <div style="margin-top:20px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:10px">Newsletter</div>
+          <div v-if="tenant.newsletter.enabled" style="margin-top:20px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:10px">{{ tenant.newsletter.title }}</div>
             <NexoraNewsletterSignup />
           </div>
         </div>

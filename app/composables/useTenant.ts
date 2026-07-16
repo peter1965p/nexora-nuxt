@@ -119,6 +119,11 @@ export interface NexoraShopConfig {
   title?: string
 }
 
+export interface NexoraNewsletterConfig {
+  enabled: boolean
+  title?: string
+}
+
 export interface NexoraVehiclesConfig {
   enabled: boolean
   title?: string
@@ -154,6 +159,7 @@ export interface TenantData {
   github: NexoraGithubConfig
   blog: NexoraBlogConfig
   shop: NexoraShopConfig
+  newsletter: NexoraNewsletterConfig
   vehicles: NexoraVehiclesConfig
   menu: NexoraMenuConfig
   properties: NexoraPropertiesConfig
@@ -224,6 +230,7 @@ const DEFAULT: TenantData = {
   github:       { enabled: false, repos: [], title: 'PROJEKTE' },
   blog:         { enabled: false, title: 'Blog' },
   shop:         { enabled: false, title: 'Shop' },
+  newsletter:   { enabled: false, title: 'Newsletter' },
   vehicles:     { enabled: false, title: 'Fahrzeuge' },
   menu:         { enabled: false, title: 'Speisekarte' },
   properties:   { enabled: false, title: 'Immobilien' },
@@ -325,6 +332,10 @@ export const useTenant = () => {
         blog: {
           enabled: b.blogEnabled ?? false,
           title:   b.blogTitle   || 'Blog',
+        },
+        newsletter: {
+          enabled: b.newsletterEnabled ?? false,
+          title:   b.newsletterTitle   || 'Newsletter',
         },
         shop: {
           enabled: b.shopEnabled ?? false,
