@@ -1,8 +1,8 @@
 <template>
   <div class="nx-newsletter">
     <div v-if="state === 'success'" class="nx-newsletter-msg">
-      <i class="ti ti-mail-check" style="font-size:22px;color:var(--nx-accent)"></i>
-      <p>Fast geschafft! Bitte bestätige deine Anmeldung über den Link in der E-Mail, die wir dir gerade geschickt haben.</p>
+      <i class="ti ti-mail-check" style="font-size:16px;flex-shrink:0;margin-top:1px"></i>
+      <span>Fast geschafft! Bitte bestätige die Anmeldung über den Link in deiner E-Mail.</span>
     </div>
     <form v-else class="nx-newsletter-form" @submit.prevent="submit">
       <input
@@ -49,19 +49,20 @@ async function submit() {
 </script>
 
 <style scoped>
-.nx-newsletter { max-width: 420px; }
-.nx-newsletter-form { display: flex; gap: 8px; }
+.nx-newsletter { max-width: 280px; }
+.nx-newsletter-form { display: flex; flex-direction: column; gap: 8px; }
 .nx-newsletter-input {
-  flex: 1; height: 44px; padding: 0 16px; border-radius: 8px;
+  height: 36px; padding: 0 12px; border-radius: 6px; width: 100%; box-sizing: border-box;
   border: 1px solid var(--nx-border); background: var(--nx-surface); color: var(--nx-text);
-  font-size: 14px; font-family: inherit;
+  font-size: 13px; font-family: inherit;
 }
+.nx-newsletter-input::placeholder { color: var(--nx-muted); }
 .nx-newsletter-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .nx-newsletter-btn {
-  height: 44px; padding: 0 24px; border-radius: 8px; border: none; cursor: pointer;
-  background: var(--nx-accent); color: #fff; font-weight: 700; font-size: 14px; font-family: inherit;
+  height: 36px; padding: 0 16px; border-radius: 6px; border: none; cursor: pointer;
+  background: var(--nx-accent); color: #fff; font-weight: 700; font-size: 13px; font-family: inherit;
 }
 .nx-newsletter-btn:disabled { opacity: .6; cursor: default; }
-.nx-newsletter-msg { display: flex; align-items: center; gap: 10px; color: var(--nx-muted); font-size: 14px; }
-.nx-newsletter-error { color: #ef4444; font-size: 13px; margin-top: 8px; }
+.nx-newsletter-msg { display: flex; align-items: flex-start; gap: 8px; color: var(--nx-muted); font-size: 13px; line-height: 1.5; }
+.nx-newsletter-error { color: #ef4444; font-size: 12px; margin-top: 6px; }
 </style>
