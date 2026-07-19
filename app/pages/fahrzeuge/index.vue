@@ -14,6 +14,7 @@ interface Vehicle {
   power: string
   price: string | number
   color: string
+  images?: string[]
   imageUrl?: string
   description: string
 }
