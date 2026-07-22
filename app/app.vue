@@ -13,6 +13,9 @@ useHead({
   link: computed(() => tenant.value.branding.faviconUrl ? [
     { rel: 'icon', href: tenant.value.branding.faviconUrl }
   ] : []),
+  meta: computed(() => tenant.value.metaKeywords ? [
+    { name: 'keywords', content: tenant.value.metaKeywords }
+  ] : []),
 })
 </script>
 

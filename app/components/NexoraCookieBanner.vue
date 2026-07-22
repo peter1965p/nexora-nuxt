@@ -20,6 +20,7 @@ function accept(type: 'all' | 'essential') {
   flipping.value = true
   setTimeout(() => {
     localStorage.setItem('nexora_cookie_consent', type)
+    window.dispatchEvent(new CustomEvent('nexora-consent-changed', { detail: type }))
     visible.value  = false
     flipping.value = false
   }, 700)
