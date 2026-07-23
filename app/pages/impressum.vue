@@ -6,7 +6,7 @@ const accent  = computed(() => tenant.value.branding.primaryColor || '#f97316')
 const company = computed(() => tenant.value.companyName || '')
 const contact = computed(() => tenant.value.contact || {})
 
-useHead({ title: computed(() => `Impressum — ${company.value}`) })
+useHead({ title: computed(() => tenant.value.pageTitles?.impressum || `Impressum — ${company.value}`) })
 </script>
 
 <template>

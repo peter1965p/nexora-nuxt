@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { tenant } = useTenant()
-useHead({ title: computed(() => `Über uns · ${tenant.value.companyName || 'Nexora'}`) })
+useHead({ title: computed(() => tenant.value.pageTitles?.about || `Über uns · ${tenant.value.companyName || 'Nexora'}`) })
 </script>
 
 <template>

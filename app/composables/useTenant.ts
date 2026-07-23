@@ -150,6 +150,7 @@ export interface TenantData {
   companyName: string
   metaKeywords: string
   gaMeasurementId: string
+  pageTitles: Record<string, string>
   branding: NexoraBranding
   content: NexoraContent
   services: NexoraService[]
@@ -218,6 +219,7 @@ const DEFAULT: TenantData = {
   companyName: 'Mein Unternehmen',
   metaKeywords: '',
   gaMeasurementId: '',
+  pageTitles: {},
   branding: { primaryColor: '#f97316', heroBackground: 'grid', heroGradient: { from: '#fb923c', via: '#ea580c', to: '#431407' }, servicesLayout: 'auto' },
   content: {
     hero: { headline: 'Willkommen', subheadline: 'Ihr zuverlässiger Partner', cta: 'Kontakt aufnehmen' },
@@ -302,6 +304,7 @@ export const useTenant = () => {
         companyName: b.companyName || DEFAULT.companyName,
         metaKeywords:    b.metaKeywords    || '',
         gaMeasurementId: b.gaMeasurementId || '',
+        pageTitles:      b.pageTitles      || {},
         branding: { ...DEFAULT.branding, ...b, primaryColor: b.config?.primaryColor || b.primaryColor || DEFAULT.branding.primaryColor, heroMediaType: b.heroMediaType || 'code', heroImageUrl: b.heroImageUrl || '' },
         content: {
           hero: {

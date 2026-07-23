@@ -4,6 +4,8 @@ const { tenant } = useTenant()
 const orderedSections = computed(() =>
   (tenant.value.sectionOrder || ['stack', 'clients', 'github'])
 )
+
+useHead({ title: computed(() => tenant.value.pageTitles?.start || tenant.value.companyName || 'Nexora') })
 </script>
 
 <template>
