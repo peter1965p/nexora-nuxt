@@ -245,6 +245,108 @@ const DEFAULT: TenantData = {
   navOrder:     ['start', 'leistungen', 'about', 'kontakt', 'shop', 'blog', 'vehicles', 'menu', 'properties', 'termine'],
 }
 
+// Baut das komplette TenantData-Objekt aus den 9 parallelen Public-API-Fetches. Läuft
+// bei SSR serverseitig, bei reiner Client-Navigation im Browser — Rückgabewert (nicht
+// direktes tenant.value = ...) ist wichtig, damit useAsyncData() das Ergebnis korrekt
+// in den Payload serialisieren und beim Hydration-Client wiederverwenden kann.
+async function fetchTenantData(apiUrl: string, tenantId: string): Promise<TenantData | null> {
+  const [branding, content, services, contact, pagesRes, stackRes, clientsRes, githubRes, layoutRes] = await Promise.allSettled([
+    $fetch<any>(`${apiUrl}/api/public/${tenantId}/branding`),
+    $fetch<any>(`${apiUrl}/api/public/${tenantId}/content`),
+    $fetch<any>(`${apiUrl}/api/public/${tenantId}/services`),
+    $fetch<NexoraContact>(`${apiUrl}/api/public/${tenantId}/contact`),
+    $fetch<{ pages: NexoraPage[]; theme: string }>(`${apiUrl}/api/public/${tenantId}/pages`),
+    $fetch<NexoraStackConfig>(`${apiUrl}/api/public/${tenantId}/stack`),
+    $fetch<NexoraClientsConfig>(`${apiUrl}/api/public/${tenantId}/clients`),
+    $fetch<NexoraGithubConfig>(`${apiUrl}/api/public/${tenantId}/github`),
+    $fetch<NexoraLayout>(`${apiUrl}/api/public/${tenantId}/layout`),
+  ])
+
+  const b  = branding.status  === 'fulfilled' ? branding.value  : {}
+  const c  = content.status   === 'fulfilled' ? content.value   : {}
+  const s  = services.status  === 'fulfilled' ? services.value  : []
+  const k  = contact.status   === 'fulfilled' ? contact.value   : {}
+  const pg = pagesRes.status  === 'fulfilled' ? pagesRes.value  : { pages: [], theme: 'midnight' }
+  const st = stackRes.status   === 'fulfilled' ? stackRes.value   : null
+  const cl = clientsRes.status === 'fulfilled' ? clientsRes.value : null
+  const gh = githubRes.status  === 'fulfilled' ? githubRes.value  : null
+  const lo = layoutRes.status  === 'fulfilled' ? layoutRes.value  : null
+
+  const theme = pg.theme || 'midnight'
+
+  return {
+    tenantId,
+    companyName: b.companyName || DEFAULT.companyName,
+    metaKeywords:    b.metaKeywords    || '',
+    gaMeasurementId: b.gaMeasurementId || '',
+    pageTitles:      b.pageTitles      || {},
+    branding: { ...DEFAULT.branding, ...b, primaryColor: b.config?.primaryColor || b.primaryColor || DEFAULT.branding.primaryColor, heroMediaType: b.heroMediaType || 'code', heroImageUrl: b.heroImageUrl || '' },
+    content: {
+      hero: {
+        headline:    c.hero?.headline    || DEFAULT.content.hero?.headline,
+        subheadline: c.hero?.subline     || c.hero?.subheadline || DEFAULT.content.hero?.subheadline,
+        desc:        c.hero?.desc        || '',
+        location:    c.hero?.location    || '',
+        cta:         c.hero?.ctaLabel    || c.hero?.cta         || DEFAULT.content.hero?.cta,
+      },
+      about: { ...DEFAULT.content.about, ...(c.about || {}) },
+      stats: c.about?.stats?.length ? c.about.stats : DEFAULT.content.stats,
+      footer: { ...DEFAULT.content.footer, ...(c.footer || {}) },
+    },
+    services: Array.isArray(s?.services) && s.services.length ? s.services : DEFAULT.services,
+    contact: { ...DEFAULT.contact, ...k },
+    pages: pg.pages || [],
+    theme,
+    stack: {
+      enabled: st?.enabled ?? false,
+      items:   st?.items   || [],
+      title:   st?.title   || 'TECH STACK',
+      legend:  st?.legend  || {},
+    },
+    clients: {
+      enabled: cl?.enabled ?? false,
+      items:   cl?.items   || [],
+      title:   cl?.title   || 'REFERENZEN',
+    },
+    github: {
+      enabled: gh?.enabled ?? false,
+      repos:   gh?.repos   || [],
+      title:   gh?.title   || 'PROJEKTE',
+    },
+    blog: {
+      enabled: b.blogEnabled ?? false,
+      title:   b.blogTitle   || 'Blog',
+    },
+    newsletter: {
+      enabled: b.newsletterEnabled ?? false,
+      title:   b.newsletterTitle   || 'Newsletter',
+    },
+    shop: {
+      enabled: b.shopEnabled ?? false,
+      title:   b.shopTitle   || 'Shop',
+    },
+    vehicles: {
+      enabled: b.vehiclesEnabled ?? false,
+      title:   b.vehiclesTitle   || 'Fahrzeuge',
+    },
+    menu: {
+      enabled: b.menuEnabled ?? false,
+      title:   b.menuTitle   || 'Speisekarte',
+      orderingEnabled: b.orderingEnabled ?? false,
+    },
+    properties: {
+      enabled: b.propertiesEnabled ?? false,
+      title:   b.propertiesTitle   || 'Immobilien',
+    },
+    termine: {
+      enabled: b.termineEnabled ?? false,
+      title:   b.termineTitle   || 'Termine',
+    },
+    sectionOrder: lo?.sectionOrder || ['stack', 'clients', 'github', 'services', 'contact'],
+    navOrder: b.navOrder || ['start', 'leistungen', 'about', 'kontakt', 'shop', 'blog', 'vehicles', 'menu', 'properties', 'termine'],
+  }
+}
+
 export const useTenant = () => {
   const config = useRuntimeConfig()
   const tenant = useState<TenantData>('tenant', () => ({ ...DEFAULT }))
@@ -253,127 +355,43 @@ export const useTenant = () => {
   const resolve = async () => {
     if (resolved.value) return
 
-    const apiUrl = config.public.plexoraApiUrl as string
-    let tenantId = ''
-
-    if (import.meta.client) {
-      const host = window.location.hostname
+    // useAsyncData() statt freiem await-Code: Nuxt awaited jeden useAsyncData()-Aufruf,
+    // der synchron während des Component-Setups initiiert wird, automatisch bei SSR
+    // (bevor die Antwort ausgeliefert wird) — deshalb liegt HIER die gesamte Host- und
+    // Content-Auflösung innerhalb des Handlers, nicht davor. Der Key 'tenant-data' sorgt
+    // dafür, dass alle Aufrufstellen (app.vue, einzelne Seiten, Plugins) sich einen
+    // einzigen, gecachten Fetch teilen statt mehrfach zu laden — ersetzt den früheren,
+    // nicht nebenläufigkeitssicheren `resolved`-Boolean-Handschlag.
+    const { data } = await useAsyncData('tenant-data', async () => {
+      const apiUrl = config.public.plexoraApiUrl as string
+      // useRequestURL() ist universell (server: aus dem Request, client: aus
+      // window.location) — ersetzt den früheren import.meta.client-Gate, der auf dem
+      // Server sonst IMMER eine leere tenantId liefern würde.
+      const host = useRequestURL().hostname
       const isLocalhost = host === 'localhost' || host === '127.0.0.1'
       const isPreview   = host.endsWith('.pages.dev')
+      let tenantId = ''
       if (isLocalhost || isPreview) {
         tenantId = config.public.devTenantId as string
       } else {
         try {
-          const r = await $fetch<{ tenantId: string }>(
-            `${apiUrl}/api/public/resolve?host=${host}`
-          )
+          const r = await $fetch<{ tenantId: string }>(`${apiUrl}/api/public/resolve?host=${host}`)
           if (r?.tenantId) tenantId = r.tenantId
         } catch {}
       }
-    }
+      if (!tenantId) return null
 
-    if (!tenantId) { resolved.value = true; return }
-
-    try {
-      const [branding, content, services, contact, pagesRes, stackRes, clientsRes, githubRes, layoutRes] = await Promise.allSettled([
-        $fetch<any>(`${apiUrl}/api/public/${tenantId}/branding`),
-        $fetch<any>(`${apiUrl}/api/public/${tenantId}/content`),
-        $fetch<any>(`${apiUrl}/api/public/${tenantId}/services`),
-        $fetch<NexoraContact>(`${apiUrl}/api/public/${tenantId}/contact`),
-        $fetch<{ pages: NexoraPage[]; theme: string }>(`${apiUrl}/api/public/${tenantId}/pages`),
-        $fetch<NexoraStackConfig>(`${apiUrl}/api/public/${tenantId}/stack`),
-        $fetch<NexoraClientsConfig>(`${apiUrl}/api/public/${tenantId}/clients`),
-        $fetch<NexoraGithubConfig>(`${apiUrl}/api/public/${tenantId}/github`),
-        $fetch<NexoraLayout>(`${apiUrl}/api/public/${tenantId}/layout`),
-      ])
-
-      const b  = branding.status  === 'fulfilled' ? branding.value  : {}
-      const c  = content.status   === 'fulfilled' ? content.value   : {}
-      const s  = services.status  === 'fulfilled' ? services.value  : []
-      const k  = contact.status   === 'fulfilled' ? contact.value   : {}
-      const pg = pagesRes.status  === 'fulfilled' ? pagesRes.value  : { pages: [], theme: 'midnight' }
-      const st = stackRes.status   === 'fulfilled' ? stackRes.value   : null
-      const cl = clientsRes.status === 'fulfilled' ? clientsRes.value : null
-      const gh = githubRes.status  === 'fulfilled' ? githubRes.value  : null
-      const lo = layoutRes.status  === 'fulfilled' ? layoutRes.value  : null
-
-      const theme = pg.theme || 'midnight'
-
-      tenant.value = {
-        tenantId,
-        companyName: b.companyName || DEFAULT.companyName,
-        metaKeywords:    b.metaKeywords    || '',
-        gaMeasurementId: b.gaMeasurementId || '',
-        pageTitles:      b.pageTitles      || {},
-        branding: { ...DEFAULT.branding, ...b, primaryColor: b.config?.primaryColor || b.primaryColor || DEFAULT.branding.primaryColor, heroMediaType: b.heroMediaType || 'code', heroImageUrl: b.heroImageUrl || '' },
-        content: {
-          hero: {
-            headline:    c.hero?.headline    || DEFAULT.content.hero?.headline,
-            subheadline: c.hero?.subline     || c.hero?.subheadline || DEFAULT.content.hero?.subheadline,
-            desc:        c.hero?.desc        || '',
-            location:    c.hero?.location    || '',
-            cta:         c.hero?.ctaLabel    || c.hero?.cta         || DEFAULT.content.hero?.cta,
-          },
-          about: { ...DEFAULT.content.about, ...(c.about || {}) },
-          stats: c.about?.stats?.length ? c.about.stats : DEFAULT.content.stats,
-          footer: { ...DEFAULT.content.footer, ...(c.footer || {}) },
-        },
-        services: Array.isArray(s?.services) && s.services.length ? s.services : DEFAULT.services,
-        contact: { ...DEFAULT.contact, ...k },
-        pages: pg.pages || [],
-        theme,
-        stack: {
-          enabled: st?.enabled ?? false,
-          items:   st?.items   || [],
-          title:   st?.title   || 'TECH STACK',
-          legend:  st?.legend  || {},
-        },
-        clients: {
-          enabled: cl?.enabled ?? false,
-          items:   cl?.items   || [],
-          title:   cl?.title   || 'REFERENZEN',
-        },
-        github: {
-          enabled: gh?.enabled ?? false,
-          repos:   gh?.repos   || [],
-          title:   gh?.title   || 'PROJEKTE',
-        },
-        blog: {
-          enabled: b.blogEnabled ?? false,
-          title:   b.blogTitle   || 'Blog',
-        },
-        newsletter: {
-          enabled: b.newsletterEnabled ?? false,
-          title:   b.newsletterTitle   || 'Newsletter',
-        },
-        shop: {
-          enabled: b.shopEnabled ?? false,
-          title:   b.shopTitle   || 'Shop',
-        },
-        vehicles: {
-          enabled: b.vehiclesEnabled ?? false,
-          title:   b.vehiclesTitle   || 'Fahrzeuge',
-        },
-        menu: {
-          enabled: b.menuEnabled ?? false,
-          title:   b.menuTitle   || 'Speisekarte',
-          orderingEnabled: b.orderingEnabled ?? false,
-        },
-        properties: {
-          enabled: b.propertiesEnabled ?? false,
-          title:   b.propertiesTitle   || 'Immobilien',
-        },
-        termine: {
-          enabled: b.termineEnabled ?? false,
-          title:   b.termineTitle   || 'Termine',
-        },
-        sectionOrder: lo?.sectionOrder || ['stack', 'clients', 'github', 'services', 'contact'],
-        navOrder: b.navOrder || ['start', 'leistungen', 'about', 'kontakt', 'shop', 'blog', 'vehicles', 'menu', 'properties', 'termine'],
+      try {
+        return await fetchTenantData(apiUrl, tenantId)
+      } catch {
+        return null
       }
+    })
 
-      applyTheme(theme, b.config?.primaryColor || b.primaryColor)
-    } catch {}
-
+    if (data.value) {
+      tenant.value = data.value
+      applyTheme(data.value.theme, data.value.branding.primaryColor)
+    }
     resolved.value = true
   }
 
