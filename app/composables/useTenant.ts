@@ -204,6 +204,14 @@ const THEMES: Record<string, Record<string, string>> = {
     '--nx-muted':   '#64748b',
     '--nx-accent':  '#2563eb',
   },
+  dusk: {
+    '--nx-bg':      '#242230',
+    '--nx-surface': '#2f2c3d',
+    '--nx-border':  '#453f57',
+    '--nx-text':    '#f5f2fa',
+    '--nx-muted':   '#a79fc0',
+    '--nx-accent':  '#fb923c',
+  },
 }
 
 function applyTheme(themeKey: string, accentOverride?: string) {
