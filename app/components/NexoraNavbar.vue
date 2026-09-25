@@ -18,6 +18,8 @@ const termineTitle   = computed(() => tenant.value.termine?.title || 'Termine')
 
 const DEFAULT_NAV_ORDER = ['start', 'leistungen', 'about', 'kontakt', 'shop', 'blog', 'vehicles', 'menu', 'properties', 'termine']
 
+const customPages = computed(() => pages.value.filter(p => !['agb', 'datenschutz', 'impressum'].includes(p.slug)))
+
 const navItems = computed(() => {
   const all: Record<string, { to: string; label: string; enabled: boolean }> = {
     start:      { to: '/',            label: 'Start',                enabled: true },
@@ -31,11 +33,14 @@ const navItems = computed(() => {
     properties: { to: '/immobilien',  label: propertiesTitle.value,  enabled: propertiesEnabled.value },
     termine:    { to: '/termine',     label: termineTitle.value,     enabled: termineEnabled.value },
   }
+  for (const pg of customPages.value) {
+    all[pg.slug] = { to: `/${pg.slug}`, label: pg.title, enabled: true }
+  }
   const order = tenant.value.navOrder?.length ? tenant.value.navOrder : DEFAULT_NAV_ORDER
-  return order.filter(key => all[key]?.enabled).map(key => ({ key, ...all[key] }))
+  // Seiten, die es noch nicht in navOrder geschafft haben (z.B. gerade erst angelegt), hängen wir ans Ende an.
+  const orderedKeys = [...order, ...Object.keys(all).filter(key => !order.includes(key))]
+  return orderedKeys.filter(key => all[key]?.enabled).map(key => ({ key, ...all[key] }))
 })
-
-const customPages = computed(() => pages.value.filter(p => !['agb', 'datenschutz', 'impressum'].includes(p.slug)))
 
 const route = useRoute()
 watch(() => route.fullPath, () => { menuOpen.value = false })
@@ -69,12 +74,6 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
           onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
           {{ item.label }}
         </NuxtLink>
-        <NuxtLink v-for="pg in customPages" :key="pg.slug" :to="`/${pg.slug}`"
-          style="padding:6px 14px;font-size:13px;font-weight:500;color:var(--nx-muted);text-decoration:none;border-radius:6px;transition:all .15s"
-          onmouseover="this.style.color='var(--nx-text)';this.style.background='var(--nx-surface)'"
-          onmouseout="this.style.color='var(--nx-muted)';this.style.background='transparent'">
-          {{ pg.title }}
-        </NuxtLink>
       </nav>
 
       <!-- CTA -->
@@ -105,10 +104,6 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
       <NuxtLink v-for="item in navItems" :key="item.key" :to="item.to"
         style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
         {{ item.label }}
-      </NuxtLink>
-      <NuxtLink v-for="pg in customPages" :key="pg.slug" :to="`/${pg.slug}`"
-        style="display:block;padding:16px 0;font-size:20px;font-weight:600;color:var(--nx-text);text-decoration:none;border-bottom:1px solid var(--nx-border)">
-        {{ pg.title }}
       </NuxtLink>
       <NuxtLink to="/kontakt"
         style="display:block;margin-top:20px;padding:14px 20px;border-radius:8px;font-size:15px;font-weight:600;color:#fff;text-decoration:none;text-align:center"
