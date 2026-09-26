@@ -23,7 +23,11 @@ const accent   = computed(() => tenant.value.branding.primaryColor || '#f97316')
       <div class="clients-track" style="display:flex;align-items:center;white-space:nowrap">
         <div v-for="r in 2" :key="r" style="display:flex;align-items:center;flex-shrink:0">
           <template v-for="(item, i) in items" :key="(item as any).name + r + i">
-            <span style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:0 32px;cursor:default"
+            <img v-if="(item as any).logoUrl" :src="(item as any).logoUrl" :alt="(item as any).name"
+              style="height:22px;width:auto;max-width:140px;object-fit:contain;padding:0 32px;flex-shrink:0;filter:grayscale(1) brightness(1.6);opacity:.55;transition:opacity .2s,filter .2s"
+              onmouseover="this.style.opacity='1';this.style.filter='grayscale(0) brightness(1)'"
+              onmouseout="this.style.opacity='.55';this.style.filter='grayscale(1) brightness(1.6)'" />
+            <span v-else style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;padding:0 32px;cursor:default"
               :style="{ color: accent }">
               {{ (item as any).name }}
             </span>
