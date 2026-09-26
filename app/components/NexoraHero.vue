@@ -107,7 +107,7 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
 </script>
 
 <template>
-  <section style="position:relative;width:100%;min-height:100vh;display:flex;align-items:center;background:var(--nx-bg);overflow:hidden;font-family:'Inter',system-ui,sans-serif">
+  <section style="position:relative;width:100%;min-height:min(100vh,760px);display:flex;align-items:center;background:var(--nx-bg);overflow:hidden;font-family:'Inter',system-ui,sans-serif">
 
     <!-- Background -->
     <div v-if="bg === 'grid'" style="position:absolute;inset:0;pointer-events:none"
