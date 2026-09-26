@@ -17,11 +17,14 @@ const footer  = computed(() => tenant.value.content.footer || {})
         <!-- Brand -->
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-            <div style="width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#fff"
-              :style="{ background: accent }">
-              {{ company[0].toUpperCase() }}
-            </div>
-            <span style="font-size:16px;font-weight:700;color:var(--nx-text);letter-spacing:-.02em">{{ company }}</span>
+            <img v-if="tenant.branding.logoUrl" :src="tenant.branding.logoUrl" :alt="company" style="height:28px;width:auto;object-fit:contain" />
+            <template v-else>
+              <div style="width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#fff;flex-shrink:0"
+                :style="{ background: accent }">
+                {{ company[0].toUpperCase() }}
+              </div>
+              <span style="font-size:16px;font-weight:700;color:var(--nx-text);letter-spacing:-.02em">{{ company }}</span>
+            </template>
           </div>
           <p style="font-size:13px;line-height:1.6;color:var(--nx-muted);margin:0;max-width:220px">
             {{ tenant.content.footer?.tagline || 'Digitale Lösungen für Unternehmen, die wachsen wollen.' }}
