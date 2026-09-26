@@ -48,7 +48,7 @@ const footer  = computed(() => tenant.value.content.footer || {})
               onmouseout="this.style.color='var(--nx-muted)'">
               {{ pg.title }}
             </NuxtLink>
-            <NuxtLink to="/impressum"
+            <NuxtLink v-if="!pages.some(pg => pg.slug === 'impressum')" to="/impressum"
               style="font-size:13px;color:var(--nx-muted);text-decoration:none;transition:color .15s"
               onmouseover="this.style.color='var(--nx-text)'"
               onmouseout="this.style.color='var(--nx-muted)'">
