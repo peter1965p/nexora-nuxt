@@ -145,6 +145,11 @@ export interface NexoraTermineConfig {
   title?: string
 }
 
+export interface NexoraPlexiConfig {
+  enabled: boolean
+  welcome: string
+}
+
 export interface TenantData {
   tenantId: string
   companyName: string
@@ -167,6 +172,7 @@ export interface TenantData {
   menu: NexoraMenuConfig
   properties: NexoraPropertiesConfig
   termine: NexoraTermineConfig
+  plexi: NexoraPlexiConfig
   sectionOrder: string[]
   navOrder: string[]
 }
@@ -249,6 +255,7 @@ const DEFAULT: TenantData = {
   menu:         { enabled: false, title: 'Speisekarte' },
   properties:   { enabled: false, title: 'Immobilien' },
   termine:      { enabled: false, title: 'Termine' },
+  plexi:        { enabled: false, welcome: 'Hallo! Wie kann ich dir helfen?' },
   sectionOrder: ['stack', 'clients', 'github', 'services', 'contact'],
   navOrder:     ['start', 'leistungen', 'about', 'kontakt', 'shop', 'blog', 'vehicles', 'menu', 'properties', 'termine'],
 }
@@ -349,6 +356,10 @@ async function fetchTenantData(apiUrl: string, tenantId: string): Promise<Tenant
     termine: {
       enabled: b.termineEnabled ?? false,
       title:   b.termineTitle   || 'Termine',
+    },
+    plexi: {
+      enabled: b.plexiEnabled ?? false,
+      welcome: b.plexiWelcome || 'Hallo! Wie kann ich dir helfen?',
     },
     sectionOrder: lo?.sectionOrder || ['stack', 'clients', 'github', 'services', 'contact'],
     navOrder: b.navOrder || ['start', 'leistungen', 'about', 'kontakt', 'shop', 'blog', 'vehicles', 'menu', 'properties', 'termine'],

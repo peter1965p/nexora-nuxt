@@ -29,5 +29,6 @@ useHead({
   <div style="font-family:'Inter',system-ui,-apple-system,sans-serif">
     <NuxtPage />
     <NexoraCookieBanner />
+    <NexoraPlexiWidget />
   </div>
 </template>
