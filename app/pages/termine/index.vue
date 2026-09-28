@@ -9,6 +9,7 @@ const accent       = computed(() => tenant.value.branding.primaryColor || '#f973
 
 const loading = ref(true)
 const types   = ref<AppointmentType[]>([])
+const termineDescription = ref('')
 const today   = new Date().toISOString().slice(0, 10)
 
 const step         = ref(1)
@@ -31,8 +32,9 @@ onMounted(async () => {
   await resolve()
   if (!tenantId()) { loading.value = false; return }
   try {
-    const res = await $fetch<{ title: string; types: AppointmentType[] }>(`${apiUrl()}/api/public/${tenantId()}/termine`)
+    const res = await $fetch<{ title: string; description?: string; types: AppointmentType[] }>(`${apiUrl()}/api/public/${tenantId()}/termine`)
     types.value = res.types || []
+    termineDescription.value = res.description || ''
   } catch {}
   loading.value = false
 })
@@ -116,6 +118,9 @@ function backTo(s: number) { step.value = s }
         <h1 style="font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:0">
           Termin buchen
         </h1>
+        <p v-if="termineDescription" style="color:var(--nx-muted);font-size:15px;line-height:1.6;margin:14px 0 0;max-width:520px">
+          {{ termineDescription }}
+        </p>
       </div>
 
       <!-- Loading -->
