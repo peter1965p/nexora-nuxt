@@ -202,7 +202,7 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
                 <span style="margin-left:8px;font-size:11px;color:#64748b;font-family:ui-monospace,monospace">nexora.config.ts</span>
               </div>
               <!-- Animated code -->
-              <pre style="margin:0;padding:16px;font-family:ui-monospace,'SF Mono',monospace;font-size:11.5px;line-height:1.7;overflow:hidden;min-height:180px;color:#e2e8f0"><span v-for="(tk, i) in renderedTokens" :key="i" :style="{ color: tk.c || '#6b7280' }">{{ tk.t }}</span><span v-if="typing" style="color:var(--nx-accent);animation:blink .75s step-start infinite;font-weight:300">|</span></pre>
+              <pre style="margin:0;padding:16px;font-family:ui-monospace,'SF Mono',monospace;font-size:11.5px;line-height:1.7;overflow:hidden;height:180px;color:#e2e8f0"><span v-for="(tk, i) in renderedTokens" :key="i" :style="{ color: tk.c || '#6b7280' }">{{ tk.t }}</span><span v-if="typing" style="color:var(--nx-accent);animation:blink .75s step-start infinite;font-weight:300">|</span></pre>
               <!-- Status bar -->
               <div style="padding:7px 14px;background:#161b22;border-top:1px solid #21262d;display:flex;align-items:center;gap:6px">
                 <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e88"></span>

@@ -117,7 +117,7 @@ function backTo(s: number) { step.value = s }
       <!-- Header -->
       <div style="margin-bottom:40px;display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap">
         <img v-if="termineAvatarUrl" :src="termineAvatarUrl" alt=""
-          style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:2px solid var(--nx-border);flex-shrink:0" />
+          style="width:128px;height:128px;border-radius:12px;object-fit:cover;border:1px solid var(--nx-border);flex-shrink:0" />
         <div style="flex:1;min-width:240px">
           <div style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:12px">{{ termineTitle }}</div>
           <h1 style="font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:0">
