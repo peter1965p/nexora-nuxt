@@ -46,6 +46,13 @@ const clientTintHue = computed(() => {
   if (!/^[0-9a-f]{6}$/i.test(hex)) return 190
   return Math.round(hexToHue(accent.value) - 30)
 })
+const clientLogoStyle = computed(() => clientsCfg.value?.logoStyle || 'accent')
+const clientsShowText = computed(() => clientsCfg.value?.showText ?? false)
+const clientLogoFilter = computed(() => {
+  if (clientLogoStyle.value === 'original') return 'none'
+  if (clientLogoStyle.value === 'grayscale') return 'grayscale(1) brightness(1.6)'
+  return `grayscale(1) brightness(.4) sepia(1) hue-rotate(${clientTintHue.value}deg) saturate(450%)`
+})
 
 // Stack items for code editor
 const stackItems    = computed(() => tenant.value.stack?.items?.slice(0, 4) || [])
@@ -242,12 +249,14 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
             {{ clientsTitle }}
           </div>
           <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
-            <div v-for="item in clientItems" :key="(item as any).name" :title="(item as any).name">
+            <div v-for="item in clientItems" :key="(item as any).name" :title="(item as any).name"
+              style="display:flex;flex-direction:column;align-items:flex-start;gap:5px">
               <img v-if="(item as any).logoUrl" :src="(item as any).logoUrl" :alt="(item as any).name"
                 style="height:22px;width:auto;max-width:110px;object-fit:contain;opacity:.85;transition:opacity .2s"
-                :style="{ filter: `grayscale(1) brightness(.4) sepia(1) hue-rotate(${clientTintHue}deg) saturate(450%)` }"
+                :style="{ filter: clientLogoFilter }"
                 onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'" />
-              <span v-else style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase" :style="{ color: accent }">
+              <span v-if="!(item as any).logoUrl || clientsShowText" style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase"
+                :style="{ color: (item as any).logoUrl ? 'var(--nx-muted)' : accent }">
                 {{ (item as any).name }}
               </span>
             </div>

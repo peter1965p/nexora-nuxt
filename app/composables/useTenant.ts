@@ -74,6 +74,8 @@ export interface NexoraClientsConfig {
   enabled: boolean
   items: NexoraClientItem[]
   title?: string
+  logoStyle?: 'accent' | 'grayscale' | 'original'
+  showText?: boolean
 }
 
 export interface NexoraGithubRepo {
@@ -246,7 +248,7 @@ const DEFAULT: TenantData = {
   pages: [],
   theme: 'midnight',
   stack:        { enabled: false, items: [], title: 'TECH STACK', legend: {} },
-  clients:      { enabled: false, items: [], title: 'REFERENZEN' },
+  clients:      { enabled: false, items: [], title: 'REFERENZEN', logoStyle: 'accent', showText: false },
   github:       { enabled: false, repos: [], title: 'PROJEKTE' },
   blog:         { enabled: false, title: 'Blog' },
   shop:         { enabled: false, title: 'Shop' },
@@ -322,6 +324,8 @@ async function fetchTenantData(apiUrl: string, tenantId: string): Promise<Tenant
       enabled: cl?.enabled ?? false,
       items:   cl?.items   || [],
       title:   cl?.title   || 'REFERENZEN',
+      logoStyle: cl?.logoStyle || 'accent',
+      showText: cl?.showText ?? false,
     },
     github: {
       enabled: gh?.enabled ?? false,
