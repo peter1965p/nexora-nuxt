@@ -23,6 +23,30 @@ const clientItems    = computed(() => clientsCfg.value?.items || [])
 const clientsEnabled = computed(() => clientsCfg.value?.enabled !== false && clientItems.value.length > 0)
 const clientsTitle   = computed(() => clientsCfg.value?.title || 'REFERENZEN')
 
+// Logos per CSS-Filter Richtung Akzentfarbe einfärben (kein mask-image — das blieb bei
+// extern gehosteten Bildern in manchen Browsern lautlos unsichtbar). grayscale+sepia landet
+// bei ca. 30° Hue, hue-rotate gleicht das auf den tatsächlichen Farbton der Akzentfarbe aus.
+function hexToHue(hex: string): number {
+  const m = hex.replace('#', '')
+  const r = parseInt(m.slice(0, 2), 16) / 255
+  const g = parseInt(m.slice(2, 4), 16) / 255
+  const b = parseInt(m.slice(4, 6), 16) / 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b)
+  const d = max - min
+  if (d === 0) return 0
+  let h = 0
+  if (max === r) h = ((g - b) / d) % 6
+  else if (max === g) h = (b - r) / d + 2
+  else h = (r - g) / d + 4
+  h *= 60
+  return h < 0 ? h + 360 : h
+}
+const clientTintHue = computed(() => {
+  const hex = accent.value.replace('#', '')
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return 190
+  return Math.round(hexToHue(accent.value) - 30)
+})
+
 // Stack items for code editor
 const stackItems    = computed(() => tenant.value.stack?.items?.slice(0, 4) || [])
 const codeProvider  = computed(() => {
@@ -219,16 +243,10 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
           </div>
           <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
             <div v-for="item in clientItems" :key="(item as any).name" :title="(item as any).name">
-              <div v-if="(item as any).logoUrl"
-                style="width:92px;height:24px;opacity:.85;transition:opacity .2s"
-                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"
-                :style="{
-                  maskImage: `url(${(item as any).logoUrl})`, WebkitMaskImage: `url(${(item as any).logoUrl})`,
-                  maskSize: 'contain', WebkitMaskSize: 'contain',
-                  maskRepeat: 'no-repeat', WebkitMaskRepeat: 'no-repeat',
-                  maskPosition: 'left center', WebkitMaskPosition: 'left center',
-                  backgroundColor: accent,
-                }"></div>
+              <img v-if="(item as any).logoUrl" :src="(item as any).logoUrl" :alt="(item as any).name"
+                style="height:22px;width:auto;max-width:110px;object-fit:contain;opacity:.85;transition:opacity .2s"
+                :style="{ filter: `grayscale(1) brightness(.4) sepia(1) hue-rotate(${clientTintHue}deg) saturate(450%)` }"
+                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'" />
               <span v-else style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase" :style="{ color: accent }">
                 {{ (item as any).name }}
               </span>
