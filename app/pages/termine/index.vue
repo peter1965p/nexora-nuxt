@@ -10,6 +10,7 @@ const accent       = computed(() => tenant.value.branding.primaryColor || '#f973
 const loading = ref(true)
 const types   = ref<AppointmentType[]>([])
 const termineDescription = ref('')
+const termineAvatarUrl   = ref('')
 const today   = new Date().toISOString().slice(0, 10)
 
 const step         = ref(1)
@@ -32,9 +33,10 @@ onMounted(async () => {
   await resolve()
   if (!tenantId()) { loading.value = false; return }
   try {
-    const res = await $fetch<{ title: string; description?: string; types: AppointmentType[] }>(`${apiUrl()}/api/public/${tenantId()}/termine`)
+    const res = await $fetch<{ title: string; description?: string; avatarUrl?: string; types: AppointmentType[] }>(`${apiUrl()}/api/public/${tenantId()}/termine`)
     types.value = res.types || []
     termineDescription.value = res.description || ''
+    termineAvatarUrl.value = res.avatarUrl || ''
   } catch {}
   loading.value = false
 })
@@ -113,14 +115,18 @@ function backTo(s: number) { step.value = s }
     <div style="max-width:720px;margin:0 auto;padding:100px 24px 80px">
 
       <!-- Header -->
-      <div style="margin-bottom:40px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:12px">{{ termineTitle }}</div>
-        <h1 style="font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:0">
-          Termin buchen
-        </h1>
-        <p v-if="termineDescription" style="color:var(--nx-muted);font-size:15px;line-height:1.6;margin:14px 0 0;max-width:520px">
-          {{ termineDescription }}
-        </p>
+      <div style="margin-bottom:40px;display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap">
+        <img v-if="termineAvatarUrl" :src="termineAvatarUrl" alt=""
+          style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:2px solid var(--nx-border);flex-shrink:0" />
+        <div style="flex:1;min-width:240px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:12px">{{ termineTitle }}</div>
+          <h1 style="font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:0">
+            Termin buchen
+          </h1>
+          <p v-if="termineDescription" style="color:var(--nx-muted);font-size:15px;line-height:1.6;margin:14px 0 0;max-width:520px">
+            {{ termineDescription }}
+          </p>
+        </div>
       </div>
 
       <!-- Loading -->
