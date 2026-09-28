@@ -19,8 +19,8 @@ const slots         = ref<string[]>([])
 const loadingSlots  = ref(false)
 const slotsLoaded   = ref(false)
 
-const form     = reactive({ name: '', email: '', phone: '', notes: '' })
-const booking  = ref<{ typeName: string; date: string; startTime: string; endTime: string; customerName: string; meetLink: string | null } | null>(null)
+const form     = reactive({ name: '', email: '', phone: '', notes: '', channel: 'video' as 'video' | 'phone' })
+const booking  = ref<{ typeName: string; date: string; startTime: string; endTime: string; customerName: string; channel?: string; meetLink: string | null } | null>(null)
 const booking_error = ref('')
 const submitting = ref(false)
 
@@ -75,6 +75,7 @@ function selectSlot(s: string) {
 
 async function submitBooking() {
   if (!form.name || !form.email || !selectedType.value || !selectedSlot.value) return
+  if (form.channel === 'phone' && !form.phone) { booking_error.value = 'Bitte eine Telefonnummer angeben.'; return }
   submitting.value = true
   booking_error.value = ''
   try {
@@ -88,6 +89,7 @@ async function submitBooking() {
         customerEmail: form.email,
         customerPhone: form.phone,
         notes: form.notes,
+        channel: form.channel,
       },
     })
     booking.value = res.booking
@@ -145,6 +147,9 @@ function backTo(s: number) { step.value = s }
             :style="{ background: accent }">
             <i class="ti ti-video"></i> Meeting beitreten
           </a>
+        </div>
+        <div v-else-if="booking.channel === 'phone'" style="margin-top:20px;color:var(--nx-muted);font-size:13px">
+          <i class="ti ti-phone" style="margin-right:6px"></i>Wir rufen dich zur vereinbarten Zeit an.
         </div>
       </div>
 
@@ -209,6 +214,21 @@ function backTo(s: number) { step.value = s }
             <strong>{{ selectedType?.name }}</strong> · {{ formatDate(selectedDate) }} · {{ selectedSlot }} Uhr
           </div>
           <form @submit.prevent="submitBooking" style="display:flex;flex-direction:column;gap:16px">
+            <div>
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:8px">Wie soll der Termin stattfinden?</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" class="form-row">
+                <button type="button" @click="form.channel = 'video'"
+                  style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s"
+                  :style="form.channel === 'video' ? { border: `1px solid ${accent}`, background: accent + '18', color: accent } : { border: '1px solid var(--nx-border)', background: 'var(--nx-surface)', color: 'var(--nx-text)' }">
+                  <i class="ti ti-video"></i> Online (Video)
+                </button>
+                <button type="button" @click="form.channel = 'phone'"
+                  style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s"
+                  :style="form.channel === 'phone' ? { border: `1px solid ${accent}`, background: accent + '18', color: accent } : { border: '1px solid var(--nx-border)', background: 'var(--nx-surface)', color: 'var(--nx-text)' }">
+                  <i class="ti ti-phone"></i> Telefonisch
+                </button>
+              </div>
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="form-row">
               <div>
                 <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:8px">Name *</label>
@@ -222,8 +242,8 @@ function backTo(s: number) { step.value = s }
               </div>
             </div>
             <div>
-              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:8px">Telefon</label>
-              <input v-model="form.phone" type="text" placeholder="+49 123 456789"
+              <label style="display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:8px">Telefon{{ form.channel === 'phone' ? ' *' : '' }}</label>
+              <input v-model="form.phone" type="text" placeholder="+49 123 456789" :required="form.channel === 'phone'"
                 style="width:100%;padding:12px 14px;border:1px solid var(--nx-border);border-radius:8px;background:var(--nx-surface);color:var(--nx-text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box" />
             </div>
             <div>
