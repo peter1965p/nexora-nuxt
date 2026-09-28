@@ -13,10 +13,10 @@ useHead({ title: computed(() => tenant.value.pageTitles?.start || tenant.value.c
     <NexoraNavbar />
     <main>
       <NexoraHero />
+      <!-- "clients" (Referenzen) läuft jetzt kompakt im Hero-Bereich, nicht mehr als eigene Sektion -->
       <template v-for="section in orderedSections" :key="section">
-        <NexoraStack   v-if="section === 'stack'" />
-        <NexoraClients v-else-if="section === 'clients'" />
-        <NexoraGitHub  v-else-if="section === 'github'" />
+        <NexoraStack  v-if="section === 'stack'" />
+        <NexoraGitHub v-else-if="section === 'github'" />
       </template>
     </main>
     <NexoraFooter />

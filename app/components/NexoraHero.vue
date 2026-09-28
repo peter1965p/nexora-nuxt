@@ -17,6 +17,12 @@ const parsed = computed(() => {
   return { headline: (hero.value as any).headline || 'Software, die', oval, rest }
 })
 
+// Referenzen — kompakt unter der Code-Animation statt als eigene volle Sektion
+const clientsCfg     = computed(() => tenant.value.clients)
+const clientItems    = computed(() => clientsCfg.value?.items || [])
+const clientsEnabled = computed(() => clientsCfg.value?.enabled !== false && clientItems.value.length > 0)
+const clientsTitle   = computed(() => clientsCfg.value?.title || 'REFERENZEN')
+
 // Stack items for code editor
 const stackItems    = computed(() => tenant.value.stack?.items?.slice(0, 4) || [])
 const codeProvider  = computed(() => {
@@ -175,7 +181,7 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
       </div>
 
       <!-- RIGHT: Code editor OR custom image -->
-      <div style="display:flex;align-items:center;justify-content:center;position:relative" class="hero-right">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative" class="hero-right">
 
         <!-- Custom image -->
         <img v-if="heroMediaType === 'image' && heroImageUrl"
@@ -205,6 +211,30 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
             </div>
           </div>
         </template>
+
+        <!-- Referenzen: kompakte Logo-Reihe, Silhouette im Akzent-Blau statt Graustufen -->
+        <div v-if="clientsEnabled" style="width:100%;max-width:480px;margin-top:20px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:14px">
+            {{ clientsTitle }}
+          </div>
+          <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+            <div v-for="item in clientItems" :key="(item as any).name" :title="(item as any).name">
+              <div v-if="(item as any).logoUrl"
+                style="width:92px;height:24px;opacity:.85;transition:opacity .2s"
+                onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'"
+                :style="{
+                  maskImage: `url(${(item as any).logoUrl})`, WebkitMaskImage: `url(${(item as any).logoUrl})`,
+                  maskSize: 'contain', WebkitMaskSize: 'contain',
+                  maskRepeat: 'no-repeat', WebkitMaskRepeat: 'no-repeat',
+                  maskPosition: 'left center', WebkitMaskPosition: 'left center',
+                  backgroundColor: accent,
+                }"></div>
+              <span v-else style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase" :style="{ color: accent }">
+                {{ (item as any).name }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
