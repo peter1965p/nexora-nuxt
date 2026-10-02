@@ -37,6 +37,14 @@ onMounted(async () => {
     types.value = res.types || []
     termineDescription.value = res.description || ''
     termineAvatarUrl.value = res.avatarUrl || ''
+
+    // Deep-Link aus Kampagnen/Automatisierungen: ?type=<typeId> springt direkt zur
+    // Terminwahl für diese eine Terminart, statt erst die Übersicht zu zeigen.
+    const requestedType = useRoute().query.type as string | undefined
+    if (requestedType) {
+      const match = types.value.find(t => t.typeId === requestedType)
+      if (match) selectType(match)
+    }
   } catch {}
   loading.value = false
 })
