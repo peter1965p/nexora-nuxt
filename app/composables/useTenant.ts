@@ -37,6 +37,21 @@ export interface NexoraService {
   features: string[]
 }
 
+export interface NexoraPricingPackage {
+  name: string
+  price: string
+  period: string
+  features: string[]
+  highlighted?: boolean
+}
+
+export interface NexoraPricingConfig {
+  enabled: boolean
+  title: string
+  subtitle: string
+  packages: NexoraPricingPackage[]
+}
+
 export interface NexoraContact {
   email?: string
   phone?: string
@@ -161,6 +176,7 @@ export interface TenantData {
   branding: NexoraBranding
   content: NexoraContent
   services: NexoraService[]
+  pricing: NexoraPricingConfig
   contact: NexoraContact
   pages: NexoraPage[]
   theme: string
@@ -244,6 +260,7 @@ const DEFAULT: TenantData = {
     footer: { tagline: '', statusLabel: 'System Online', showStatus: true },
   },
   services: [],
+  pricing: { enabled: false, title: 'Leistungen & Preise', subtitle: 'Transparente Pakete für dein Projekt', packages: [] },
   contact: {},
   pages: [],
   theme: 'midnight',
@@ -311,6 +328,12 @@ async function fetchTenantData(apiUrl: string, tenantId: string): Promise<Tenant
       footer: { ...DEFAULT.content.footer, ...(c.footer || {}) },
     },
     services: Array.isArray(s?.services) && s.services.length ? s.services : DEFAULT.services,
+    pricing: {
+      enabled:  s?.pricingEnabled  ?? DEFAULT.pricing.enabled,
+      title:    s?.pricingTitle    || DEFAULT.pricing.title,
+      subtitle: s?.pricingSubtitle || DEFAULT.pricing.subtitle,
+      packages: Array.isArray(s?.pricingPackages) ? s.pricingPackages : DEFAULT.pricing.packages,
+    },
     contact: { ...DEFAULT.contact, ...k },
     pages: pg.pages || [],
     theme,

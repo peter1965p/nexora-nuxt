@@ -8,6 +8,7 @@ useHead({ title: computed(() => tenant.value.pageTitles?.leistungen || `Leistung
     <NexoraNavbar />
     <main>
       <NexoraServices />
+      <NexoraPricing />
     </main>
     <NexoraFooter />
   </div>
