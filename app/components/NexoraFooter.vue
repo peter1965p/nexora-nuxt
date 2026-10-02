@@ -17,7 +17,7 @@ const footer  = computed(() => tenant.value.content.footer || {})
         <!-- Brand -->
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-            <img v-if="tenant.branding.logoUrl" :src="tenant.branding.logoUrl" :alt="company" style="height:28px;width:auto;object-fit:contain" />
+            <img v-if="tenant.branding.logoUrl" :src="tenant.branding.logoUrl" :alt="company" style="height:40px;width:auto;object-fit:contain" />
             <template v-else>
               <div style="width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#fff;flex-shrink:0"
                 :style="{ background: accent }">

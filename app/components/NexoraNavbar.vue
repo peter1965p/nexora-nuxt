@@ -53,7 +53,7 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
       <!-- Logo -->
       <NuxtLink to="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0">
         <div v-if="tenant.branding.logoUrl">
-          <img :src="tenant.branding.logoUrl" :alt="tenant.companyName" style="height:32px;width:auto;object-fit:contain" />
+          <img :src="tenant.branding.logoUrl" :alt="tenant.companyName" style="height:46px;width:auto;object-fit:contain" />
         </div>
         <template v-else>
           <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#fff;flex-shrink:0"
