@@ -224,7 +224,7 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
           <div style="position:absolute;inset:-40px;border-radius:24px;opacity:.15;filter:blur(60px);pointer-events:none"
             :style="{ background: accent }"></div>
           <div style="position:relative;width:100%;max-width:480px">
-            <div style="width:100%;background:#0d1117;border-radius:14px;border:1px solid #1e293b;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04);transform:perspective(1000px) rotateY(-4deg) rotateX(2deg)">
+            <div style="width:100%;background:#0d1117;border-radius:14px;border:1px solid #1e293b;overflow:hidden;box-shadow:0 16px 32px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.04);transform:perspective(1000px) rotateY(-4deg) rotateX(2deg)">
               <!-- Title bar -->
               <div style="padding:10px 14px;background:#161b22;border-bottom:1px solid #21262d;display:flex;align-items:center;gap:6px">
                 <div style="width:10px;height:10px;border-radius:50%;background:#ef4444"></div>
@@ -244,7 +244,7 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
         </template>
 
         <!-- Referenzen: kompakte Logo-Reihe, Silhouette im Akzent-Blau statt Graustufen -->
-        <div v-if="clientsEnabled" style="width:100%;max-width:480px;margin-top:20px">
+        <div v-if="clientsEnabled" style="width:100%;max-width:480px;margin-top:44px">
           <div style="font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--nx-muted);margin-bottom:14px">
             {{ clientsTitle }}
           </div>
