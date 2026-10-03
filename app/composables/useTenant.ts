@@ -110,6 +110,7 @@ export interface NexoraGithubConfig {
   enabled: boolean
   title?: string
   repos: NexoraGithubRepo[]
+  cardShadow?: boolean
 }
 
 export interface NexoraLayout {
@@ -362,9 +363,10 @@ async function fetchTenantData(apiUrl: string, tenantId: string): Promise<Tenant
       showText: cl?.showText ?? false,
     },
     github: {
-      enabled: gh?.enabled ?? false,
-      repos:   gh?.repos   || [],
-      title:   gh?.title   || 'PROJEKTE',
+      enabled:    gh?.enabled ?? false,
+      repos:      gh?.repos   || [],
+      title:      gh?.title   || 'PROJEKTE',
+      cardShadow: gh?.cardShadow ?? true,
     },
     blog: {
       enabled: b.blogEnabled ?? false,

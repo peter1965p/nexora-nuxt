@@ -47,8 +47,9 @@ function timeAgo(iso: string) {
         <a v-for="repo in github.repos" :key="repo.name"
           :href="repo.url" target="_blank" rel="noopener noreferrer"
           style="display:block;text-decoration:none;padding:20px;border:1px solid var(--nx-border);border-radius:12px;background:var(--nx-surface);transition:all .2s;cursor:pointer"
-          onmouseover="this.style.borderColor='var(--nx-accent)';this.style.transform='translateY(-2px)'"
-          onmouseout="this.style.borderColor='var(--nx-border)';this.style.transform='translateY(0)'">
+          :style="{ boxShadow: github.cardShadow !== false ? '0 4px 16px rgba(0,0,0,.08)' : 'none' }"
+          @mouseover="(e: MouseEvent) => { const t = e.currentTarget as HTMLElement; t.style.borderColor = 'var(--nx-accent)'; t.style.transform = 'translateY(-2px)'; if (github.cardShadow !== false) t.style.boxShadow = '0 10px 28px rgba(0,0,0,.14)' }"
+          @mouseout="(e: MouseEvent) => { const t = e.currentTarget as HTMLElement; t.style.borderColor = 'var(--nx-border)'; t.style.transform = 'translateY(0)'; t.style.boxShadow = github.cardShadow !== false ? '0 4px 16px rgba(0,0,0,.08)' : 'none' }">
 
           <!-- Repo name + external link -->
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
