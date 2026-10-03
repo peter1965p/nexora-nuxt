@@ -246,6 +246,16 @@ function applyTheme(themeKey: string, accentOverride?: string) {
   if (accentOverride) root.style.setProperty('--nx-accent', accentOverride)
 }
 
+// Zweite, von JS unabhängige Absicherung: baut die gleichen CSS-Variablen als Text für
+// ein <style>-Tag, das schon im server-gerenderten HTML steckt — damit stimmt das Theme
+// vom allerersten Paint an, auch bevor applyTheme() im Browser überhaupt laufen konnte.
+export function themeStyleTag(themeKey: string, accentOverride?: string): string {
+  const vars = { ...(THEMES[themeKey] || THEMES.midnight) }
+  if (accentOverride) vars['--nx-accent'] = accentOverride
+  const decls = Object.entries(vars).map(([k, v]) => `${k}:${v}`).join(';')
+  return `:root{${decls}}`
+}
+
 const DEFAULT: TenantData = {
   tenantId: '',
   companyName: 'Mein Unternehmen',
@@ -399,7 +409,13 @@ export const useTenant = () => {
   const resolved = useState<boolean>('tenantResolved', () => false)
 
   const resolve = async () => {
-    if (resolved.value) return
+    // SSR setzt resolved bereits auf true, bevor der Client das Theme je angewendet hat
+    // (applyTheme() ist dort ein bewusster No-Op) — ohne diesen Zweig würde der
+    // Theme-Wechsel beim Hydration-Aufruf im Browser sonst komplett übersprungen.
+    if (resolved.value) {
+      if (import.meta.client) applyTheme(tenant.value.theme, tenant.value.branding.primaryColor)
+      return
+    }
 
     // useAsyncData() statt freiem await-Code: Nuxt awaited jeden useAsyncData()-Aufruf,
     // der synchron während des Component-Setups initiiert wird, automatisch bei SSR

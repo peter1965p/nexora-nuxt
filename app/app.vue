@@ -22,6 +22,9 @@ useHead({
   meta: computed(() => tenant.value.metaKeywords ? [
     { name: 'keywords', content: tenant.value.metaKeywords }
   ] : []),
+  // Theme-Variablen schon serverseitig ins HTML — applyTheme() in useTenant.ts übernimmt
+  // das identisch nochmal client-seitig, das hier ist nur die Absicherung für den allerersten Paint.
+  style: computed(() => [{ innerHTML: themeStyleTag(tenant.value.theme, tenant.value.branding.primaryColor) }]),
 })
 </script>
 
