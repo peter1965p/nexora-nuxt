@@ -60,6 +60,11 @@ function timeAgo(iso: string) {
             <i class="ti ti-external-link" style="font-size:12px;color:var(--nx-muted);flex-shrink:0;margin-top:2px"></i>
           </div>
 
+          <!-- README-Bild (falls vorhanden) -->
+          <img v-if="repo.imageUrl" :src="repo.imageUrl" alt=""
+            style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:12px;background:var(--nx-bg)"
+            loading="lazy" @error="($event.target as HTMLImageElement).style.display='none'" />
+
           <!-- Description -->
           <p v-if="repo.description"
             style="font-size:12px;color:var(--nx-muted);line-height:1.5;margin:0 0 14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">

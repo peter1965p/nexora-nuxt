@@ -103,6 +103,7 @@ export interface NexoraGithubRepo {
   forks: number
   topics: string[]
   updatedAt: string
+  imageUrl?: string
 }
 
 export interface NexoraGithubConfig {
