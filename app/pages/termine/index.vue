@@ -33,16 +33,18 @@ onMounted(async () => {
   await resolve()
   if (!tenantId()) { loading.value = false; return }
   try {
-    const res = await $fetch<{ title: string; description?: string; avatarUrl?: string; types: AppointmentType[] }>(`${apiUrl()}/api/public/${tenantId()}/termine`)
+    // Kampagnen-Terminarten sind nur über ?type=<typeId> sichtbar, deshalb wird der Parameter mitgegeben
+    const deepLinkType = useRoute().query.type as string | undefined
+    const query = deepLinkType ? `?type=${encodeURIComponent(deepLinkType)}` : ''
+    const res = await $fetch<{ title: string; description?: string; avatarUrl?: string; types: AppointmentType[] }>(`${apiUrl()}/api/public/${tenantId()}/termine${query}`)
     types.value = res.types || []
     termineDescription.value = res.description || ''
     termineAvatarUrl.value = res.avatarUrl || ''
 
     // Deep-Link aus Kampagnen/Automatisierungen: ?type=<typeId> springt direkt zur
     // Terminwahl für diese eine Terminart, statt erst die Übersicht zu zeigen.
-    const requestedType = useRoute().query.type as string | undefined
-    if (requestedType) {
-      const match = types.value.find(t => t.typeId === requestedType)
+    if (deepLinkType) {
+      const match = types.value.find(t => t.typeId === deepLinkType)
       if (match) selectType(match)
     }
   } catch {}
