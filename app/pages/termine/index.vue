@@ -26,6 +26,11 @@ const booking  = ref<{ typeName: string; date: string; startTime: string; endTim
 const booking_error = ref('')
 const submitting = ref(false)
 
+// Bot-Schutz (Cloudflare Turnstile) nur bei Kampagnen-Terminen, die der Server auch prüft
+const botProtection  = ref<{ siteKey: string; mode: string } | null>(null)
+const turnstileToken = ref('')
+const turnstileRef   = ref<{ reset: () => void } | null>(null)
+
 function apiUrl() { return config.public.plexoraApiUrl as string }
 function tenantId() { return tenant.value.tenantId }
 
@@ -36,8 +41,9 @@ onMounted(async () => {
     // Kampagnen-Terminarten sind nur über ?type=<typeId> sichtbar, deshalb wird der Parameter mitgegeben
     const deepLinkType = useRoute().query.type as string | undefined
     const query = deepLinkType ? `?type=${encodeURIComponent(deepLinkType)}` : ''
-    const res = await $fetch<{ title: string; description?: string; avatarUrl?: string; types: AppointmentType[] }>(`${apiUrl()}/api/public/${tenantId()}/termine${query}`)
+    const res = await $fetch<{ title: string; description?: string; avatarUrl?: string; types: AppointmentType[]; botProtection?: { siteKey: string; mode: string } | null }>(`${apiUrl()}/api/public/${tenantId()}/termine${query}`)
     types.value = res.types || []
+    botProtection.value = res.botProtection || null
     termineDescription.value = res.description || ''
     termineAvatarUrl.value = res.avatarUrl || ''
 
@@ -90,6 +96,7 @@ function selectSlot(s: string) {
 async function submitBooking() {
   if (!form.name || !form.email || !selectedType.value || !selectedSlot.value) return
   if (form.channel === 'phone' && !form.phone) { booking_error.value = 'Bitte eine Telefonnummer angeben.'; return }
+  if (botProtection.value && !turnstileToken.value) { booking_error.value = 'Bitte warten Sie einen Moment, bis die Sicherheitsprüfung abgeschlossen ist, und senden Sie dann erneut.'; return }
   submitting.value = true
   booking_error.value = ''
   try {
@@ -104,13 +111,21 @@ async function submitBooking() {
         customerPhone: form.phone,
         notes: form.notes,
         channel: form.channel,
+        ...(botProtection.value ? { turnstileToken: turnstileToken.value } : {}),
       },
     })
     booking.value = res.booking
   } catch (e: any) {
-    booking_error.value = e?.data?.message || 'Dieser Termin ist leider nicht mehr verfügbar. Bitte wähle einen anderen Zeitpunkt.'
-    step.value = 2
-    loadSlots()
+    const status = e?.statusCode ?? e?.response?.status
+    if ([403, 429, 503].includes(status) && e?.data?.message) {
+      // Sicherheitsprüfung / Drossel: auf der Eingabeseite bleiben, Meldung des Servers zeigen, neues Token holen
+      booking_error.value = e.data.message
+      turnstileRef.value?.reset()
+    } else {
+      booking_error.value = e?.data?.message || 'Dieser Termin ist leider nicht mehr verfügbar. Bitte wähle einen anderen Zeitpunkt.'
+      step.value = 2
+      loadSlots()
+    }
   }
   submitting.value = false
 }
@@ -272,6 +287,8 @@ function backTo(s: number) { step.value = s }
               <textarea v-model="form.notes" rows="3" placeholder="Worum geht es?"
                 style="width:100%;padding:12px 14px;border:1px solid var(--nx-border);border-radius:8px;background:var(--nx-surface);color:var(--nx-text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:vertical"></textarea>
             </div>
+            <TurnstileWidget v-if="botProtection" ref="turnstileRef" v-model="turnstileToken"
+              :site-key="botProtection.siteKey" :mode="botProtection.mode" />
             <div v-if="booking_error" style="font-size:13px;padding:12px 16px;border-radius:8px;color:#f87171;background:#f8717111;border:1px solid #f8717133">
               {{ booking_error }}
             </div>

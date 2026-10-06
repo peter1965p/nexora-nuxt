@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { tenant } = useTenant()
+const { tenant, resolve } = useTenant()
 const config     = useRuntimeConfig()
 
 const accent    = computed(() => tenant.value.branding.primaryColor || '#f97316')
@@ -9,6 +9,19 @@ const phoneHref = computed(() => {
 })
 
 const form    = reactive({ name: '', email: '', subject: '', message: '' })
+
+// Bot-Schutz (Cloudflare Turnstile): Widget nur, wenn der Server das Kontaktformular auch prüft
+const botProtection  = ref<{ siteKey: string; mode: string } | null>(null)
+const turnstileToken = ref('')
+const turnstileRef   = ref<{ reset: () => void } | null>(null)
+onMounted(async () => {
+  try {
+    await resolve()
+    if (!tenant.value.tenantId) return
+    const info = await $fetch<{ botProtection?: { siteKey: string; mode: string } | null }>(`${config.public.plexoraApiUrl}/api/public/${tenant.value.tenantId}/contact`)
+    botProtection.value = info?.botProtection || null
+  } catch { /* ohne Widget weiter; der Server weist ungeschützte Absendungen bei Bedarf ab */ }
+})
 const sending = ref(false)
 const sent    = ref(false)
 const error   = ref('')
@@ -18,6 +31,10 @@ async function submit() {
     error.value = 'Bitte Name, E-Mail und Nachricht ausfüllen.'
     return
   }
+  if (botProtection.value && !turnstileToken.value) {
+    error.value = 'Bitte warten Sie einen Moment, bis die Sicherheitsprüfung abgeschlossen ist, und senden Sie dann erneut.'
+    return
+  }
   sending.value = true
   error.value   = ''
   try {
@@ -25,12 +42,16 @@ async function submit() {
     const tenantId = tenant.value.tenantId
     await $fetch(`${apiUrl}/api/public/${tenantId}/contact`, {
       method: 'POST',
-      body: { name: form.name, email: form.email, subject: form.subject, message: form.message },
+      body: { name: form.name, email: form.email, subject: form.subject, message: form.message, ...(botProtection.value ? { turnstileToken: turnstileToken.value } : {}) },
     })
     sent.value = true
     form.name = form.email = form.subject = form.message = ''
-  } catch {
-    error.value = 'Senden fehlgeschlagen — bitte direkt per E-Mail melden.'
+  } catch (e: any) {
+    // Meldungen des Servers (Sicherheitsprüfung, zu viele Anfragen) zeigen, sonst allgemeiner Hinweis
+    error.value = [403, 429, 503].includes(e?.statusCode ?? e?.response?.status) && e?.data?.message
+      ? e.data.message
+      : 'Senden fehlgeschlagen — bitte direkt per E-Mail melden.'
+    turnstileRef.value?.reset()        // Token ist nur einmal gültig
   }
   sending.value = false
 }
@@ -168,6 +189,8 @@ async function submit() {
                 @blur="($event.target as HTMLTextAreaElement).style.borderColor = 'var(--nx-border)'">
               </textarea>
             </div>
+            <TurnstileWidget v-if="botProtection" ref="turnstileRef" v-model="turnstileToken"
+              :site-key="botProtection.siteKey" :mode="botProtection.mode" />
             <div v-if="error"
               style="font-size:13px;padding:12px 16px;border-radius:8px;color:#f87171;background:#f8717111;border:1px solid #f8717133">
               {{ error }}
