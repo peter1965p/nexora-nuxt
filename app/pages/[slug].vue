@@ -16,6 +16,27 @@ const renderedContent = computed(() => {
   return page.value.content
 })
 
+// Vollständige HTML-Dokumente (<!DOCTYPE html> oder <html>, mit eigenem <style> für body, :root usw.) werden isoliert in einem Rahmen gezeigt,
+// so wie sie gedacht sind: ihr CSS wirkt nur dort (kein Eingriff in die Website) und ihre body-Stile (Hintergrund, Schriftfarbe) greifen.
+// Ohne allow-scripts: Skripte im Inhalt laufen nicht. Links öffnen in der Hauptseite, außer sie haben ein eigenes target (z. B. _blank).
+const isDocument = computed(() => !!page.value && page.value.contentType !== 'markdown' && /^\s*(<!doctype html|<html[\s>])/i.test(String(page.value.content || '')))
+const docHtml = computed(() => {
+  const html = String(page.value?.content || '')
+  return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, m => m + '<base target="_top">') : '<base target="_top">' + html
+})
+const frame = ref<HTMLIFrameElement | null>(null)
+function measure() {
+  const f = frame.value, doc = f?.contentDocument
+  if (!f || !doc) return
+  f.style.height = '120px'                       // erst klein: ein "min-height: 100vh" im Inhalt soll nicht die alte Höhe festhalten
+  f.style.height = Math.ceil(Math.max(doc.documentElement.scrollHeight, doc.body?.scrollHeight || 0)) + 'px'
+}
+function onFrameLoad() { measure(); setTimeout(measure, 300); setTimeout(measure, 1500) }   // nach Bildern und Schriften noch einmal
+let resizeTimer: ReturnType<typeof setTimeout> | undefined
+const onResize = () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(measure, 150) }
+onMounted(() => window.addEventListener('resize', onResize))
+onBeforeUnmount(() => { window.removeEventListener('resize', onResize); clearTimeout(resizeTimer) })
+
 useHead({
   title: computed(() => page.value ? `${page.value.title} · ${tenant.value.companyName}` : tenant.value.companyName),
 })
@@ -25,7 +46,12 @@ useHead({
   <div style="background:var(--nx-bg);color:var(--nx-text);min-height:100vh;font-family:'Inter',system-ui,sans-serif">
     <NexoraNavbar />
 
-    <div v-if="page" style="max-width:768px;margin:0 auto;padding:100px 24px 80px">
+    <div v-if="page && isDocument" style="padding-top:68px">
+      <iframe ref="frame" :srcdoc="docHtml" :title="page.title" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" scrolling="no"
+        style="display:block;width:100%;border:0;min-height:300px" @load="onFrameLoad" />
+    </div>
+
+    <div v-else-if="page" style="max-width:768px;margin:0 auto;padding:100px 24px 80px">
       <NuxtLink to="/"
         style="display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--nx-muted);text-decoration:none;margin-bottom:40px;transition:color .15s"
         onmouseover="this.style.color='var(--nx-text)'"
