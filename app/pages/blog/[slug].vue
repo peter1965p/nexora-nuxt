@@ -72,6 +72,8 @@ function formatDate(d?: string) {
       </div>
 
       <div class="prose-content prose-blog" v-html="renderedContent" />
+
+      <BlogComments :slug="post.slug" />
     </div>
 
     <div v-else style="max-width:768px;margin:0 auto;padding:120px 24px;text-align:center;color:var(--nx-muted)">
