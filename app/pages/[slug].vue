@@ -32,7 +32,7 @@ useHead({
         onmouseout="this.style.color='var(--nx-muted)'">
         ← Zurück
       </NuxtLink>
-      <div class="prose-content" v-html="renderedContent" />
+      <div class="prose-page" v-html="renderedContent" />
     </div>
 
     <div v-else style="max-width:768px;margin:0 auto;padding:120px 24px;text-align:center;color:var(--nx-muted)">
@@ -44,13 +44,15 @@ useHead({
   </div>
 </template>
 
-<style scoped>
-.prose-content :deep(h1) { font-size: 2rem; font-weight: 900; margin-bottom: 1.5rem; color: var(--nx-text); }
-.prose-content :deep(h2) { font-size: 1.25rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--nx-text); }
-.prose-content :deep(h3) { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 .75rem; color: var(--nx-text); }
-.prose-content :deep(p)  { font-size: 0.875rem; line-height: 1.75; color: var(--nx-muted); margin-bottom: 1rem; }
-.prose-content :deep(a)  { color: var(--nx-accent); text-decoration: none; }
-.prose-content :deep(strong) { color: var(--nx-text); font-weight: 700; }
-.prose-content :deep(ul) { padding-left: 1.5rem; margin-bottom: 1rem; }
-.prose-content :deep(li) { font-size: 0.875rem; color: var(--nx-muted); margin-bottom: .25rem; }
+<style>
+/* Standard-Formatierung für Seiteninhalte. Mit :where() haben diese Regeln kein Gewicht: eigene Farben, Klassen und Inline-Stile im Inhalt
+   (z. B. dunkle Karten mit heller Schrift) gewinnen immer. Vorher überschrieben diese Regeln deren Überschriften- und Textfarben. */
+:where(.prose-page) :where(h1) { font-size: 2rem; font-weight: 900; margin-bottom: 1.5rem; color: var(--nx-text); }
+:where(.prose-page) :where(h2) { font-size: 1.25rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--nx-text); }
+:where(.prose-page) :where(h3) { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 .75rem; color: var(--nx-text); }
+:where(.prose-page) :where(p)  { font-size: 0.875rem; line-height: 1.75; color: var(--nx-muted); margin-bottom: 1rem; }
+:where(.prose-page) :where(a)  { color: var(--nx-accent); text-decoration: none; }
+:where(.prose-page) :where(strong) { color: var(--nx-text); font-weight: 700; }
+:where(.prose-page) :where(ul) { padding-left: 1.5rem; margin-bottom: 1rem; }
+:where(.prose-page) :where(li) { font-size: 0.875rem; color: var(--nx-muted); margin-bottom: .25rem; }
 </style>

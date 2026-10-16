@@ -71,7 +71,7 @@ function formatDate(d?: string) {
         <img :src="post.coverImageUrl" :alt="post.title" style="width:100%;height:100%;object-fit:cover" />
       </div>
 
-      <div class="prose-content" v-html="renderedContent" />
+      <div class="prose-content prose-blog" v-html="renderedContent" />
     </div>
 
     <div v-else style="max-width:768px;margin:0 auto;padding:120px 24px;text-align:center;color:var(--nx-muted)">
@@ -88,17 +88,19 @@ function formatDate(d?: string) {
 /* Clearfix: verhindert, dass der Beitrag optisch "abreißt", wenn ein linksbündiges
    Bild höher ist als der danach folgende Text */
 .prose-content::after { content: ''; display: table; clear: both; }
-.prose-content :deep(h1) { font-size: 28px; font-weight: 800; letter-spacing: -.02em; margin: 40px 0 16px; color: var(--nx-text); }
-.prose-content :deep(h2) { font-size: 22px; font-weight: 700; margin: 36px 0 14px; color: var(--nx-text); }
-.prose-content :deep(h3) { font-size: 18px; font-weight: 700; margin: 28px 0 12px; color: var(--nx-text); }
-.prose-content :deep(p) { margin: 0 0 18px; }
-.prose-content :deep(ul),
-.prose-content :deep(ol) { margin: 0 0 18px; padding-left: 24px; }
-.prose-content :deep(li) { margin-bottom: 6px; }
-.prose-content :deep(a) { color: var(--nx-accent); }
-.prose-content :deep(strong) { font-weight: 700; color: var(--nx-text); }
-.prose-content :deep(blockquote) { border-left: 3px solid var(--nx-accent); padding-left: 16px; color: var(--nx-muted); margin: 0 0 18px; }
-.prose-content :deep(code) { background: var(--nx-surface); border-radius: 4px; padding: 2px 6px; font-size: 13px; }
-.prose-content :deep(pre) { background: var(--nx-surface); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 0 0 18px; }
-.prose-content :deep(img) { max-width: 100%; height: auto; border-radius: 10px; }
+</style>
+<style>
+/* Beitragsformatierung ohne Gewicht (:where): eigene Farben und Stile im Beitrag gewinnen */
+:where(.prose-blog) :where(h1) { font-size: 28px; font-weight: 800; letter-spacing: -.02em; margin: 40px 0 16px; color: var(--nx-text); }
+:where(.prose-blog) :where(h2) { font-size: 22px; font-weight: 700; margin: 36px 0 14px; color: var(--nx-text); }
+:where(.prose-blog) :where(h3) { font-size: 18px; font-weight: 700; margin: 28px 0 12px; color: var(--nx-text); }
+:where(.prose-blog) :where(p) { margin: 0 0 18px; }
+:where(.prose-blog) :where(ul), :where(.prose-blog) :where(ol) { margin: 0 0 18px; padding-left: 24px; }
+:where(.prose-blog) :where(li) { margin-bottom: 6px; }
+:where(.prose-blog) :where(a) { color: var(--nx-accent); }
+:where(.prose-blog) :where(strong) { font-weight: 700; color: var(--nx-text); }
+:where(.prose-blog) :where(blockquote) { border-left: 3px solid var(--nx-accent); padding-left: 16px; color: var(--nx-muted); margin: 0 0 18px; }
+:where(.prose-blog) :where(code) { background: var(--nx-surface); border-radius: 4px; padding: 2px 6px; font-size: 13px; }
+:where(.prose-blog) :where(pre) { background: var(--nx-surface); border-radius: 8px; padding: 16px; overflow-x: auto; margin: 0 0 18px; }
+:where(.prose-blog) :where(img) { max-width: 100%; height: auto; border-radius: 10px; }
 </style>
