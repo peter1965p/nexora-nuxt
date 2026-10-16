@@ -8,7 +8,7 @@ const config   = useRuntimeConfig()
 interface FullPost {
   postId: string; title: string; slug: string; excerpt: string
   content: string; contentType: string; coverImageUrl?: string
-  tags?: string[]; publishedAt?: string
+  tags?: string[]; authorName?: string; publishedAt?: string
 }
 
 const post    = ref<FullPost | null>(null)
@@ -58,14 +58,14 @@ function formatDate(d?: string) {
       </NuxtLink>
 
       <div v-if="post.tags?.length" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
-        <span v-for="tag in post.tags" :key="tag"
-          style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--nx-surface);color:var(--nx-muted);border:1px solid var(--nx-border)">
+        <NuxtLink v-for="tag in post.tags" :key="tag" :to="{ path: '/blog', query: { tag } }" :title="`Alle Beiträge mit dem Tag ${tag}`"
+          style="text-decoration:none;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--nx-surface);color:var(--nx-muted);border:1px solid var(--nx-border)">
           {{ tag }}
-        </span>
+        </NuxtLink>
       </div>
 
       <h1 style="font-size:clamp(24px,4vw,40px);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin:0 0 12px">{{ post.title }}</h1>
-      <div style="font-size:13px;color:var(--nx-muted);margin-bottom:32px">{{ formatDate(post.publishedAt) }}</div>
+      <div style="font-size:13px;color:var(--nx-muted);margin-bottom:32px">{{ (post.authorName || tenant.companyName) ? 'von ' : '' }}<strong v-if="post.authorName || tenant.companyName" style="color:var(--nx-text);font-weight:600">{{ post.authorName || tenant.companyName }}</strong>{{ (post.authorName || tenant.companyName) ? ' · ' : '' }}{{ formatDate(post.publishedAt) }}</div>
 
       <div v-if="post.coverImageUrl" style="border-radius:12px;overflow:hidden;margin-bottom:40px;aspect-ratio:16/9;background:var(--nx-surface)">
         <img :src="post.coverImageUrl" :alt="post.title" style="width:100%;height:100%;object-fit:cover" />

@@ -124,6 +124,7 @@ export interface NexoraBlogPost {
   excerpt: string
   coverImageUrl?: string
   tags?: string[]
+  authorName?: string
   publishedAt?: string
   contentType: string
 }
