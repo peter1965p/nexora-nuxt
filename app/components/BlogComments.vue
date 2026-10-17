@@ -9,11 +9,17 @@ const comments = ref<{ commentId: string; name: string; text: string; created: s
 const view = ref<'login' | 'register' | 'forgot'>('login')
 const form = reactive({ name: '', email: '', password: '', text: '', website: '' })
 const busy = ref(false), msg = ref(''), err = ref('')
+// Bot-Schutz (Cloudflare Turnstile): Widget nur, wenn der Server die Prüfung auch verlangt (Konto anlegen, Passwort vergessen)
+const botProtection = ref<{ siteKey: string; mode: string } | null>(null)
+const tsToken = ref(''), tsRef = ref<{ reset: () => void } | null>(null)
+watch(view, () => { tsToken.value = '' })
+function needToken() { if (botProtection.value && !tsToken.value) throw new Error('Bitte bestätige zuerst die Sicherheitsprüfung („Ich bin kein Roboter“).') }
+function resetToken() { tsToken.value = ''; tsRef.value?.reset() }          // ein Token gilt nur einmal
 
 async function loadComments() {
   try {
-    const r = await $fetch<{ mode: any; comments: any[] }>(`${v.base()}/blog/${encodeURIComponent(props.slug)}/comments`)
-    mode.value = r.mode; comments.value = r.comments || []
+    const r = await $fetch<{ mode: any; comments: any[]; botProtection?: { siteKey: string; mode: string } | null }>(`${v.base()}/blog/${encodeURIComponent(props.slug)}/comments`)
+    mode.value = r.mode; comments.value = r.comments || []; botProtection.value = r.botProtection || null
   } catch { mode.value = 'off' }
 }
 onMounted(async () => {
@@ -25,8 +31,8 @@ onMounted(async () => {
 const fmt = (d: string) => new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) + ', ' + new Date(d).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
 async function run(fn: () => Promise<void>) { busy.value = true; err.value = ''; msg.value = ''; try { await fn() } catch (e: any) { err.value = e.message } finally { busy.value = false } }
 const doLogin = () => run(async () => { const r = await v.post('visitor/login', { email: form.email, password: form.password }, false); v.save(r.token, r.name); form.password = '' })
-const doRegister = () => run(async () => { const r = await v.post('visitor/register', { name: form.name, email: form.email, password: form.password }, false); msg.value = r.message; form.password = '' })
-const doForgot = () => run(async () => { const r = await v.post('visitor/forgot', { email: form.email }, false); msg.value = r.message })
+const doRegister = () => run(async () => { needToken(); try { const r = await v.post('visitor/register', { name: form.name, email: form.email, password: form.password, turnstileToken: tsToken.value }, false); msg.value = r.message; form.password = '' } finally { resetToken() } })
+const doForgot = () => run(async () => { needToken(); try { const r = await v.post('visitor/forgot', { email: form.email, turnstileToken: tsToken.value }, false); msg.value = r.message } finally { resetToken() } })
 const doLogout = () => run(async () => { try { await v.post('visitor/logout') } catch { /* auch ohne Server abmelden */ } v.clear() })
 const doComment = () => run(async () => {
   const r = await v.post(`blog/${encodeURIComponent(props.slug)}/comments`, { text: form.text, website: form.website })
@@ -82,11 +88,13 @@ const doDelete = () => run(async () => {
           <input v-model="form.name" type="text" required minlength="2" maxlength="60" autocomplete="name" placeholder="Dein Name (wird bei Kommentaren angezeigt)" class="inp" />
           <input v-model="form.email" type="email" required autocomplete="email" placeholder="E-Mail-Adresse (wird nicht angezeigt)" class="inp" />
           <input v-model="form.password" type="password" required minlength="10" autocomplete="new-password" placeholder="Passwort (mindestens 10 Zeichen)" class="inp" />
+          <TurnstileWidget v-if="botProtection" ref="tsRef" v-model="tsToken" :site-key="botProtection.siteKey" :mode="botProtection.mode" />
           <button class="btn" :disabled="busy" type="submit">{{ busy ? 'Moment …' : 'Konto anlegen' }}</button>
           <p style="font-size:11px;color:var(--nx-muted);margin:0;line-height:1.5">Wir speichern deinen Namen und deine E-Mail-Adresse nur, um dein Konto zu führen und Kommentare zuzuordnen. Du kannst dein Konto jederzeit selbst löschen. Mehr in der <NuxtLink to="/datenschutz" style="color:var(--nx-accent)">Datenschutzerklärung</NuxtLink>.</p>
         </form>
         <form v-else @submit.prevent="doForgot" style="display:grid;gap:10px;max-width:420px">
           <input v-model="form.email" type="email" required autocomplete="email" placeholder="E-Mail-Adresse deines Kontos" class="inp" />
+          <TurnstileWidget v-if="botProtection" ref="tsRef" v-model="tsToken" :site-key="botProtection.siteKey" :mode="botProtection.mode" />
           <div style="display:flex;align-items:center;gap:14px"><button class="btn" :disabled="busy" type="submit">{{ busy ? 'Moment …' : 'Link senden' }}</button><button type="button" class="lnk" @click="view = 'login'; err = ''; msg = ''">Zurück</button></div>
         </form>
       </template>
